@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block title %}IMS{% endblock %}
+
+{% block content %}
+
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Inventory</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
+        <!-- Create item modal -->
+        <button type="button" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="modal"
+            data-bs-target="#createItemModal">Create Item
+        </button>
+    </div>
+</div>
+<div class="table-responsive small">
+    <table id="itemTable" class="table table-sm">
+        <thead>
+            <tr>
+                <th scope="col" class="first-column">Item</th>
+                <th scope="col" class="location-col">Location</th>
+                <th scope="col" class="stock-col">Stock</th>
+                <th scope="col" class="unit-col">Unit</th>
+                <th scope="col" class="sku-col">SKU</th>
+                <th scope="col" class="actions-col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if inventory %}
+            {% for item in inventory %}
+            <tr data-item-id="{{ item.item_id }}">
+                <th scope="row">{{ item.name }}</th>
+                <td>{{ item.location_id }}</td>
+                <td>{{ item.stock }}</td>
+                <td>{{ item.unit }}</td>
+                <td>{{ item.item_id }}</td>
+                <td>
+                    <div class="dropdown">
+                        <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <svg class="bi">
+                                <use xlink:href="#three-dots"></use>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item edit-item" data-bs-toggle="modal" data-bs-target="#editItemModal" 
+                                data-item-id="{{ item.item_id }}">Edit
+                            </a>
+                            <a class="dropdown-item" href="#">Duplicate</a>
+                            <a class="dropdown-item" href="#">Archive</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#resetConf"
+                                data-item-name="{{ item.name }}" data-item-id="{{ item.item_id }}">Delete
+                            </a>
+
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<!-- Delete Item Modal -->
+<div id="resetConf" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 class="modal-title">Delete Item</h3>
+                <p>Are you sure you would like to delete the <strong><span id="itemNameToDelete"></span></strong> item?
+                    This action is permanent.</p>
+
+                <form id="deleteForm" action="/removeitem" method="post">
+                    <!-- value field is populated by js when the dropdown delete button is pressed -->
+                    <input type="hidden" id="itemIdInput" name="item_id" value="">
+
+                    <div class="button-group-container d-flex justify-content-between">
+                        <!-- delete button (also dismisses modal) -->
+                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal"
+                            style="width: calc(50% - 10px);">
+                            <strong>Delete</strong>
+                        </button>
+
+                        <button id="closeModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            style="width: calc(50% - 10px);">
+                            Close
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Item Modal -->
+<div id="createItemModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-fullscreen">
+        <form id="createItemForm" action="/createitem" method="post">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <h2 class="modal-title w-100 text-center">Create Item</h2>
+
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container" style="max-width: 750px;">
+
+                        <h5 class="modal-title">Details</h5>
+
+                        <input type="hidden" type="text" id="itemID" name="itemID" class="form-control" value=""/>
+
+                        <div class="mb-3">
+                            <label>Name</label>
+                            <input type="text" id="itemName" name="itemName" placeholder="Name" class="form-control" value=""/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="itemDescription">Description</label>
+                            <textarea id="itemDescription" name="itemDescription" placeholder="Description" class="form-control"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="itemLocation">Location</label>
+                            <input id="itemLocation" name="itemLocation" placeholder="Item Location" class="form-control">
+                        </div>
+                        
+                        
+                        <div class="mb-3">
+                            <label for="itemGTIN">GTIN</label>
+                            <input type="text" id="itemGTIN" name="itemGTIN" placeholder="GTIN" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="itemSKU">SKU</label>
+                            <input type="text" id="itemSKU" name="itemSKU" placeholder="SKU" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="itemUnit">Unit</label>
+                            <input type="text" id="itemUnit" name="itemUnit" placeholder="Unit" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="itemWeight">Weight</label>
+                            <input type="text" id="itemWeight" name="itemWeight" placeholder="Weight" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemPrice">Price</label>
+                            <input type="text" id="itemPrice" name="itemPrice" placeholder="Price" class="form-control" value=""/>
+                        </div>
+
+                        <h5>Manage Stock</h5>
+                        
+                        <div class="mb-3">
+                            <label for="itemStock">Stock</label>
+                            <input type="text" id="itemStock" name="itemStock" placeholder="Stock" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="itemLowStockLevel">Low Stock Level</label>
+                            <input type="text" id="itemLowStockLevel" name="itemLowStockLevel" placeholder="Low Stock Level" class="form-control" value=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- EDIT Item Modal -->
+<div id="editItemModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-fullscreen">
+        <form id="createItemForm" action="/updateitem" method="post">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <h2 class="modal-title w-100 text-center">Edit Item</h2>
+
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="container" style="max-width: 750px;">
+
+                        <h5 class="modal-title">Details</h5>
+
+                        <input type="hidden" type="text" id="editItemID" name="editItemID" class="form-control" value=""/>
+
+                        <div class="mb-3">
+                            <label>Name</label>
+                            <input type="text" id="editItemName" name="editItemName" placeholder="Name" class="form-control" value=""/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editItemDescription">Description</label>
+                            <textarea id="editItemDescription" name="editItemDescription" placeholder="Description" class="form-control"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editItemLocation">Location</label>
+                            <input id="editItemLocation" name="editItemLocation" placeholder="Item Location" class="form-control">
+                        </div>
+                        
+                        
+                        <div class="mb-3">
+                            <label for="editItemGTIN">GTIN</label>
+                            <input type="text" id="editItemGTIN" name="editItemGTIN" placeholder="GTIN" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemSKU">SKU</label>
+                            <input type="text" id="editItemSKU" name="editItemSKU" placeholder="SKU" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemUnit">Unit</label>
+                            <input type="text" id="editItemUnit" name="editItemUnit" placeholder="Unit" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemWeight">Weight</label>
+                            <input type="text" id="editItemWeight" name="editItemWeight" placeholder="Weight" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemPrice">Price</label>
+                            <input type="text" id="editItemPrice" name="editItemPrice" placeholder="Price" class="form-control" value=""/>
+                        </div>
+
+                        <h5>Manage Stock</h5>
+                        
+                        <div class="mb-3">
+                            <label for="editItemStock">Stock</label>
+                            <input type="text" id="editItemStock" name="editItemStock" placeholder="Stock" class="form-control" value=""/>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editItemLowStockLevel">Low Stock Level</label>
+                            <input type="text" id="editItemLowStockLevel" name="editItemLowStockLevel" placeholder="Low Stock Level" class="form-control" value=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<!-- Dashboard Chart -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+            <svg class="bi">
+                <use xlink:href="#calendar3" />
+            </svg>
+            This week
+        </button>
+    </div>
+</div>
+
+<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+
+{% endblock %}

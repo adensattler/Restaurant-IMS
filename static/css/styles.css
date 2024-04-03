@@ -1,0 +1,53 @@
+
+/* Hide the arrow icon for elements with the class "hide-dropdown-arrow" */
+.hide-dropdown-arrow.dropdown-toggle::after {
+    display: none !important;
+}
+
+.modal-body {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+}
+
+/* Add spacing to the top and bottom of td elements */
+.table th,
+.table td {
+    padding-top: 10px; /* Adjust the top padding as needed */
+    padding-bottom: 10px; /* Adjust the bottom padding as needed */
+}
+
+/* Set a minimum width for the first inv table column */
+.first-column {
+    min-width: 260px; /* Adjust the value as needed */
+}
+
+.location-col {
+    min-width: 100px; 
+    /* max-width: 100px;
+    width: 100px; */
+}
+
+.stock-col {
+    min-width: 80px; 
+    /* max-width: 60px;
+    width: 60px; */
+}
+
+.unit-col {
+    min-width: 100px; 
+    /* max-width: 100px;
+    width: 100px; */
+}
+
+.sku-col {
+    min-width: 80px; 
+    /* max-width: px; */
+    /* width: 100px; */
+}
+
+.actions-col {
+    min-width: 48px; 
+    max-width: 48px;
+    width: 48px;
+    text-align: center;
+}
