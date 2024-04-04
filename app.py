@@ -149,9 +149,7 @@ def get_item_details():
 @app.route('/restricted')
 @login_required
 def restricted_page():
-    return 'test'
-    return 'This is a restricted page. You are logged in as: {}'.format(current_user.username)
-        
+    return 'test'        
 
 # Controllers API
 @app.route("/test")
@@ -192,4 +190,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
