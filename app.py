@@ -17,12 +17,6 @@ app = Flask(__name__)
 # load the current_app.config with the vars from .env 
 app.config.from_pyfile("config.py")
 
-# Using a production configuration
-# app.config.from_object('config.ProdConfig')
-
-# Using a development configuration
-# app.config.from_object('config.DevConfig')
-
 oauth = OAuth(app)
 
 oauth.register(
