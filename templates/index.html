@@ -18,7 +18,7 @@
         </button>
     </div>
 </div>
-<div class="table-responsive small">
+<div class="table-responsive">
     <table id="itemTable" class="table table-sm">
         <thead>
             <tr>
@@ -35,10 +35,10 @@
             {% for item in inventory %}
             <tr data-item-id="{{ item.item_id }}">
                 <th scope="row">{{ item.name }}</th>
-                <td>{{ item.location_id }}</td>
+                <td>{{ item.location_name }}</td>
                 <td>{{ item.stock }}</td>
                 <td>{{ item.unit }}</td>
-                <td>{{ item.item_id }}</td>
+                <td>{{ item.SKU }}</td>
                 <td>
                     <div class="dropdown">
                         <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"

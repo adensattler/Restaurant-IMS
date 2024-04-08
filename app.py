@@ -34,7 +34,10 @@ oauth.register(
 def index():
     db = database.getdb()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Items;")
+
+    query = " SELECT Items.*, Locations.location_name FROM Items JOIN Locations ON Items.location_id = Locations.location_id;"
+
+    cursor.execute(query)
     inventory = cursor.fetchall()
     cursor.close()
     return render_template('index.html', inventory=inventory)

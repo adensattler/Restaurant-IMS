@@ -51,3 +51,7 @@
     width: 48px;
     text-align: center;
 }
+
+#dropdownMenuButton:hover {
+    cursor: pointer;
+}
