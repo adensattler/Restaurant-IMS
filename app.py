@@ -30,7 +30,7 @@ oauth.register(
 )
 
 @app.route('/')
-@login_required
+# @login_required
 def index():
     db = database.getdb()
     cursor = db.cursor(dictionary=True)
@@ -183,6 +183,11 @@ def logout():
             quote_via=quote_plus,
         )
     )
+
+@app.route("/temp")
+def temp():
+    return render_template("datatable.html")
+    # return render_template('index.html')
 
 
 
