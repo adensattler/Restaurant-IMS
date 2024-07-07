@@ -57,7 +57,7 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     
     return start_time_rfc3339, end_time_rfc3339
 
-def list_payments(date):
+def list_payments(date=None):
     start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
 
     response = client.payments.list_payments(
@@ -67,12 +67,25 @@ def list_payments(date):
     )
     return response
 
-def extract_order_ids(payments):
+def extract_order_ids(response):
+    """
+    Extract all order_id values from the given Square JSON response.
+
+    Args:
+        response (dict): The JSON response containing payment information.
+
+    Returns:
+        list: A list of all order_id values found in the response.
+    """
     order_ids = []
-    for payment in payments:
-        if "order_id" in payment:
-            order_ids.append(payment["order_id"])
+    
+    if 'payments' in response:
+        for payment in response['payments']:
+            if 'order_id' in payment:
+                order_ids.append(payment['order_id'])
     return order_ids
+
+
 
 
 date = datetime.now()
