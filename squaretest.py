@@ -4,16 +4,16 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import pytz
+import logging
 
 
 # load all environmental variables and set them as constants
 load_dotenv()
 SQUARE_LOCATION_ID = os.getenv('SQUARE_LOCATION_ID')
 
-now_utc = datetime.now(timezone.utc)    # Get the current time in UTC
-rfc3339_date = now_utc.isoformat()      # Format the datetime object to an RFC 3339-compliant string
-# start_time = date.strftime("%Y-%m-%dT00:00:00Z"),
-# end_time = (date + timedelta(days=1)).strftime("%Y-%m-%dT00:00:00Z"),
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 client = Client(
@@ -22,6 +22,44 @@ client = Client(
     ),
     environment='sandbox')
 
+# SQUARE API FUNCTIONS
+# -----------------------------------------------------------------------------------------------------------------------
+def list_payments(date=None):
+    if not SQUARE_LOCATION_ID:
+        raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
+
+    try:
+        start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
+
+        response = client.payments.list_payments(
+            location_id = SQUARE_LOCATION_ID,
+            begin_time = start_time_rfc3339,
+            end_time = end_time_rfc3339,
+        )
+        return response
+
+    except Exception as e:
+        logger.error(f"Error listing payments: {e}")
+        raise
+
+def retrieve_orders(order_ids: list[str]):
+    if not SQUARE_LOCATION_ID:
+        raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
+    
+    try:
+        response = client.orders.batch_retrieve_orders(
+            body = {
+                "location_id": SQUARE_LOCATION_ID,
+                "order_ids": order_ids
+            }
+        )
+        return response
+    except Exception as e:
+        logger.error(f"Error retrieving orders: {e}")
+        raise
+
+
+    
 
 def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     """
@@ -57,15 +95,7 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     
     return start_time_rfc3339, end_time_rfc3339
 
-def list_payments(date=None):
-    start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
 
-    response = client.payments.list_payments(
-        location_id = SQUARE_LOCATION_ID,
-        begin_time = start_time_rfc3339,
-        end_time = end_time_rfc3339,
-    )
-    return response
 
 def extract_order_ids(response):
     """
@@ -84,6 +114,9 @@ def extract_order_ids(response):
             if 'order_id' in payment:
                 order_ids.append(payment['order_id'])
     return order_ids
+
+
+
 
 
 
