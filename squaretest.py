@@ -22,7 +22,7 @@ client = Client(
     ),
     environment='sandbox')
 
-# SQUARE API FUNCTIONS
+# SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None):
     if not SQUARE_LOCATION_ID:
@@ -96,16 +96,13 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     return start_time_rfc3339, end_time_rfc3339
 
 
-
+# JSON Parsing Functions
+# -----------------------------------------------------------------------------------------------------------------------
 def extract_order_ids(response):
     """
     Extract all order_id values from the given Square JSON response.
-
-    Args:
-        response (dict): The JSON response containing payment information.
-
-    Returns:
-        list: A list of all order_id values found in the response.
+    Args: response (dict): The JSON response containing payment information.
+    Returns: list: A list of all order_id values found in the response.
     """
     order_ids = []
     
@@ -115,22 +112,38 @@ def extract_order_ids(response):
                 order_ids.append(payment['order_id'])
     return order_ids
 
+def extract_sold_items(response):
+    sold_items = []
+    for order in response['orders']:
+        for item in order['line_items']:
+            sold_items.append({
+                'name': item['name'],
+                'quantity': int(item['quantity'])
+            })
+    return sold_items
+
+
+def process_daily_orders():
+    result = list_payments(date = datetime.now())
+    # if result.is_success():
+    #     print(result.body)
+    # elif result.is_error():
+    #     print(result.errors)
+
+    # Extract all order_id values
+    order_ids = extract_order_ids(result.body)
+    print(order_ids)
+
+    response = retrieve_orders(order_ids)
+    # print(response.body)
 
 
 
+if __name__ == '__main__':
+    process_daily_orders()
+    
 
 
-
-date = datetime.now()
-result = list_payments(date)
-if result.is_success():
-  print(result.body)
-elif result.is_error():
-  print(result.errors)
-# Extract all order_id values
-order_ids = extract_order_ids(result.body)
-
-print(order_ids)
 
 
 
