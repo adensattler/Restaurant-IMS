@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import pytz
 import logging
+import database
 
 
 # load all environmental variables and set them as constants
@@ -135,21 +136,50 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     return start_time_rfc3339, end_time_rfc3339
 
 
+def update_inventory(orders):
+    for order in orders:
+        menu_item_name = order['name']
+        quantity = order['quantity']
+        
+        # Get menu_item_id
+        menu_item_id = database.get_menu_item_id(menu_item_name)
+        
+        # Get components for this menu item
+        components = database.get_menu_item_components(menu_item_id)
+        
+        for component in components:
+            inventory_item_id = component['inventory_item_id']
+            quantity_required = component['quantity_required'] * quantity
+            
+            # Update inventory
+            database.update_inventory_quantity(inventory_item_id, quantity_required)
+
+
+
 def process_daily_orders():
+    # get all the payments that occured today.
     payments_res = list_payments(date = datetime.now())
 
-    # Extract all order_id values
+    # Extract all order_id values from all payments
     order_ids = extract_order_ids(payments_res)
     print(order_ids)
 
-    # response = retrieve_orders(order_ids)
-    # tmp = extract_sold_items(response)
-    # print(tmp)
+    # Retrieve all item names from every order
+    response = retrieve_orders(order_ids)
+    order_items = extract_sold_items(response)
+    print(order_items)
+
+    # Update the inventory associated with each and every menu item sold
+    database.update_inventory(database.getdbDev, order_items)
+
+
 
 
 
 if __name__ == '__main__':
     process_daily_orders()
+
+    # print(database.get_menu_item_id('Rib Plate'))
 
     
 
