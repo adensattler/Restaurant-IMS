@@ -35,7 +35,7 @@ def index():
     db = database.getdb()
     cursor = db.cursor(dictionary=True)
 
-    query = " SELECT Items.*, Locations.location_name FROM Items JOIN Locations ON Items.location_id = Locations.location_id;"
+    query = " SELECT InventoryItems.*, Locations.location_name FROM InventoryItems JOIN Locations ON InventoryItems.location_id = Locations.location_id;"
 
     cursor.execute(query)
     inventory = cursor.fetchall()
