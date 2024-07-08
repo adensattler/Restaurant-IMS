@@ -105,22 +105,22 @@ VALUES
 -- Populate MenuItems table
 INSERT INTO MenuItems (category_id, name, description, price)
 VALUES
-(1, 'Sweet Baby Baked Beans', 'Our signature baked beans', 4.00),
+(1, 'Sweet baby baked beans', 'Our signature baked beans', 4.00),
 (1, 'Teriyaki Parmesan Corn', 'Corn with a twist', 4.00),
 (1, 'Great Granny''s Green Beans', 'Classic green beans', 4.00),
 (1, 'Green Chili Macaroni', 'Spicy mac and cheese', 4.00),
-(2, 'Wing Wednesday Special', 'Special wing deal on Wednesdays', 1.00),
-(5, 'Wings A La Carte', 'Just the wings', 2.00),
-(5, 'Extra Sauce', 'Additional sauce portion', 0.50),
-(5, 'Ribs A La Carte', 'Just the ribs', 3.00),
-(5, 'Hotlink A La Carte', 'Single hotlink', 4.50),
-(3, 'Fountain Drinks', 'Assorted fountain drinks', 1.75),
-(3, 'Cooler Drinks', 'Assorted bottled drinks', 3.00),
-(4, 'Little Man''s Ice Cream', 'Delicious ice cream', 9.50),
+(2, 'Wing Wednesday', 'Special wing deal on Wednesdays', 1.00),
+(5, 'wings a la carte', 'Just the wings', 2.00),
+(5, 'extra sauce', 'Additional sauce portion', 0.50),
+(5, 'ribs a la carte', 'Just the ribs', 3.00),
+(5, 'hotlink a la carte', 'Single hotlink', 4.50),
+(3, 'fountain drinks', 'Assorted fountain drinks', 1.75),
+(3, 'cooler drinks', 'Assorted bottled drinks', 3.00),
+(4, 'little mans ice cream', 'Delicious ice cream', 9.50),
 (2, 'Wing Plate', 'Wings with two sides', 16.25),
-(2, 'Rib Plate', 'Ribs with two sides', 16.25),
+(2, 'Rib plate', 'Ribs with two sides', 16.25),
 (2, 'Hotlink Plate', 'Hotlink with two sides and mustard', 16.25),
-(2, 'Catfish Plate', 'Catfish with two sides', 16.25),
+(2, 'Catfish plate', 'Catfish with two sides', 16.25),
 (2, 'Two Meat Plate', 'Choice of two meats with two sides', 18.25),
 (2, 'Three Meat Plate', 'Choice of three meats with two sides', 23.25);
 
