@@ -50,6 +50,10 @@ def retrieve_orders(order_ids: list[str]):
     if not SQUARE_LOCATION_ID:
         raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
     
+    if not order_ids:
+        print("No orders to retrieve.")
+        return {"orders": []}  # Return an empty list of orders
+    
     try:
         response = client.orders.batch_retrieve_orders(
             body = {
@@ -135,12 +139,12 @@ def process_daily_orders():
     payments_res = list_payments(date = datetime.now())
 
     # Extract all order_id values
-    order_ids = extract_order_ids(payments_res.body)
+    order_ids = extract_order_ids(payments_res)
     print(order_ids)
 
-    response = retrieve_orders(order_ids)
-    tmp = extract_sold_items(response.body)
-    print(tmp)
+    # response = retrieve_orders(order_ids)
+    # tmp = extract_sold_items(response)
+    # print(tmp)
 
 
 
