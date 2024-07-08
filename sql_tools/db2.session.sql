@@ -144,7 +144,10 @@ VALUES
 (15, 13, 1, 'oz');   -- Mustard for Hotlink Plate
 
 -- @block
-SELECT * FROM MenuItemComponents;
+SELECT * FROM MenuItems;
+
+-- @block
+SELECT * FROM InventoryItems;
 
 -- @block 
 DROP TABLE MenuItems;
