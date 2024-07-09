@@ -1,10 +1,4 @@
 
--- @block
-SELECT * FROM InventoryItems;
-
--- @block
-DROP TABLE Locations;
-
 -- DATABASE CREATION BLOCK(S)
 -- --------------------------------------------------------------------
 -- @block
@@ -19,6 +13,13 @@ CREATE TABLE Locations (
 );
 
 -- @block
+CREATE TABLE Categories (
+    category_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (category_id)
+);
+
+-- @block
 CREATE TABLE InventoryItems (
     inventory_item_id INT NOT NULL AUTO_INCREMENT,
     location_id INT,
@@ -29,17 +30,10 @@ CREATE TABLE InventoryItems (
     unit VARCHAR(50),
     weight DECIMAL(10, 2),
     price DECIMAL(10, 2),
-    current_quantity INT,
-    reorder_threshold INT,
+    stock DECIMAL(10, 2),
+    low_stock_level DECIMAL(10, 2),
     PRIMARY KEY (inventory_item_id),
     FOREIGN KEY (location_id) REFERENCES Locations(location_id)
-);
-
--- @block
-CREATE TABLE Categories (
-    category_id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (category_id)
 );
 
 -- @block
@@ -85,7 +79,7 @@ INSERT INTO Categories (name) VALUES
 
 -- @block
 -- Populate InventoryItems table (sample ingredients)
-INSERT INTO InventoryItems (location_id, name, unit, price, current_quantity, reorder_threshold)
+INSERT INTO InventoryItems (location_id, name, unit, price, stock, low_stock_level)
 VALUES
 (1, 'Baked Beans', 'oz', 2.50, 100, 20),
 (1, 'Corn', 'oz', 1.50, 100, 20),
@@ -150,4 +144,4 @@ SELECT * FROM MenuItems;
 SELECT * FROM InventoryItems;
 
 -- @block 
-DROP TABLE MenuItems;
+DROP TABLE InventoryItems;
