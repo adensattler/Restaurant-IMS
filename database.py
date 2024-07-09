@@ -75,6 +75,29 @@ def update_inventory_quantity(inventory_item_id, quantity_used):
     db.commit()
     cursor.close()
 
+def add_menu_item_component(menu_item_id, inventory_item_id, quantity_required, unit=None):
+    try:
+        db = getdbDev()
+        cursor = db.cursor()
+        query="""
+        INSERT INTO MenuItemComponents (menu_item_id, inventory_item_id, quantity_required, unit)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (menu_item_id, inventory_item_id, quantity_required, unit))
+        db.commit()
+
+        print(f"Successfully added new MenuItemComponent with menu_item_id: {menu_item_id}")
+        return cursor.lastrowid     # Return the ID of the newly inserted row
+    except mysql.connector.Error as err:
+        print(f"Error adding MenuItemComponent. {err}")
+        db.rollback()
+        return None
+    finally:
+        cursor.close()
+
+
+
+
 
 def normalize_string(s):
     # First, replace smart quotes with standard quotes
