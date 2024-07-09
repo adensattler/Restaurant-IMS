@@ -1,7 +1,7 @@
 import mysql.connector
-
 from flask import current_app, g
 import os
+import unicodedata      # for normalizing query names
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,8 +41,12 @@ def close_db(e=None):
 def get_menu_item_id(menu_item_name):
     db = getdbDev()
     cursor = db.cursor(dictionary=True)
-    query = "SELECT menu_item_id FROM MenuItems WHERE name = %s"
-    cursor.execute(query, (menu_item_name, ))
+
+    # Normalize the input string
+    normalized_name = normalize_string(menu_item_name)
+
+    query = "SELECT menu_item_id FROM MenuItems WHERE LOWER(name) = LOWER(%s)"
+    cursor.execute(query, (normalized_name, ))
     result = cursor.fetchone()
     cursor.close()
     return result['menu_item_id'] if result else None
@@ -64,12 +68,17 @@ def update_inventory_quantity(inventory_item_id, quantity_used):
     db = getdbDev()
     cursor = db.cursor()
     query="""
-    UPDATE InventoryItems SET current_quantity = current_quantity - %s
+    UPDATE InventoryItems SET stock = stock - %s
     WHERE inventory_item_id = %s
     """
     cursor.execute(query, (quantity_used, inventory_item_id, ))
     db.commit()
     cursor.close()
+
+
+def normalize_string(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+
 
 def update_inventory(db, orders):
     for order in orders:
