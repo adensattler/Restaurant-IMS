@@ -77,6 +77,9 @@ def update_inventory_quantity(inventory_item_id, quantity_used):
 
 
 def normalize_string(s):
+    # First, replace smart quotes with standard quotes
+    s = s.replace("’", "'").replace("‘", "'").replace('“', '"').replace('”', '"')
+
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
 
