@@ -1,15 +1,16 @@
-from . import base as app
 import app.database as database
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 from app.helpers import login_required
 from authlib.integrations.flask_client import OAuth
+from ..extensions import oauth
 from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
 # from flask_login import login_required, login_user, current_user
+from . import base
 
 
-@app.route('/')
+@base.route('/')
 # @login_required
 def index():
     db = database.get_db()
@@ -24,7 +25,7 @@ def index():
 
 
 
-@app.route('/removeitem', methods=['POST'])
+@base.route('/removeitem', methods=['POST'])
 def remove_item():
     item_id = request.form['item_id']
     print(item_id)
@@ -36,7 +37,7 @@ def remove_item():
     cursor.close()
     return redirect("/")
 
-@app.route('/createitem', methods=['POST'])
+@base.route('/createitem', methods=['POST'])
 def create_item():
     # Ensure name was submitted
     if not request.form.get("itemName"):
@@ -67,7 +68,7 @@ def create_item():
 
     return redirect("/")
 
-@app.route('/updateitem', methods=['POST'])
+@base.route('/updateitem', methods=['POST'])
 def update_item():
     # Ensure name was entered!
     if not request.form.get("editItemName"):
@@ -113,7 +114,7 @@ def update_item():
 
     return redirect("/")
 
-@app.route('/get_item_details', methods=['POST'])
+@base.route('/get_item_details', methods=['POST'])
 def get_item_details():
     item_id = request.form.get('editItemId')
     print(item_id)
@@ -125,32 +126,32 @@ def get_item_details():
     
     return jsonify(item_details)
 
-@app.route('/restricted')
+@base.route('/restricted')
 @login_required
 def restricted_page():
     return 'test'        
 
 # Controllers API
-@app.route("/test")
+@base.route("/test")
 def home():
     return json.dumps(session.get("user"), indent=4)
 
 
-@app.route("/callback", methods=["GET", "POST"])
+@base.route("/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
     return redirect("/")
 
 
-@app.route("/login")
+@base.route("/login")
 def login():
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
+        redirect_uri=url_for("base.callback", _external=True)
     )
 
 
-@app.route("/logout")
+@base.route("/logout")
 def logout():
     session.clear()
     return redirect(
@@ -166,7 +167,7 @@ def logout():
         )
     )
 
-@app.route("/temp")
+@base.route("/temp")
 def temp():
     return render_template("datatable.html")
     # return render_template('index.html')
