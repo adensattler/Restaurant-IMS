@@ -26,17 +26,14 @@ def get_db_config():
             'database': os.getenv('DB_DATABASE')
         }
 
-def getdb():
-    if 'db' not in g or not g.db.is_connected():
-        g.db = mysql.connector.connect(
-            host=current_app.config['DB_HOST'],
-            port=current_app.config['DB_PORT'],
-            user=current_app.config['DB_USERNAME'],
-            password=current_app.config['DB_PASSWORD'],
-            database=current_app.config['DB_DATABASE']
-        )
-        print('connected')
-    return g.db
+def get_db():
+    if current_app:
+        if 'db' not in g or not g.db.is_connected():
+            g.db = mysql.connector.connect(**get_db_config())
+        return g.db
+    else:
+        # Create a new connection when outside Flask context
+        return mysql.connector.connect(**get_db_config())
 
 def getdbDev():
     tmp = mysql.connector.connect(
