@@ -54,7 +54,7 @@ def remove_item():
 
     db = database.get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM Items WHERE item_id= %s", (item_id,))
+    cursor.execute("DELETE FROM InventoryItems WHERE inventory_item_id= %s", (item_id,))
     db.commit()
     cursor.close()
     return redirect("/")
@@ -80,7 +80,7 @@ def create_item():
     cursor = db.cursor()
     # Execute the SQL query to insert a new item
     insert_query = """
-    INSERT INTO Items (name, description, location_id, GTIN, SKU, unit, weight, price, stock, low_stock_level)
+    INSERT INTO InventoryItems (name, description, location_id, GTIN, SKU, unit, weight, price, stock, low_stock_level)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     cursor.execute(insert_query, (item_name, item_description, 1, item_GTIN, item_SKU, item_unit, item_weight, item_price, item_stock, item_low_stock_level))
@@ -98,8 +98,10 @@ def update_item():
 
     # collect a
     item_id = request.form['editItemID']
+    print(item_id)
     item_name = request.form['editItemName']
     item_description = request.form['editItemDescription']
+    print(item_description)
     item_location = request.form['editItemLocation']
     item_GTIN = request.form['editItemGTIN']
     item_SKU = request.form['editItemSKU']
@@ -114,7 +116,7 @@ def update_item():
 
     # Execute the SQL query to update the item
     update_query = """
-    UPDATE Items
+    UPDATE InventoryItems
     SET name = %s,
         description = %s,
         location_id = %s,
@@ -125,7 +127,7 @@ def update_item():
         price = %s,
         stock = %s,
         low_stock_level = %s
-    WHERE item_id = %s
+    WHERE inventory_item_id = %s
     """
     cursor.execute(update_query, (item_name, item_description, item_location, item_GTIN, item_SKU, item_unit, item_weight, item_price, item_stock, item_low_stock_threshold, item_id))
     
@@ -140,7 +142,7 @@ def get_item_details():
     print(item_id)
     db = database.get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM Items WHERE Items.item_id = %s", (item_id,))
+    cursor.execute("SELECT * FROM InventoryItems WHERE InventoryItems.inventory_item_id = %s", (item_id,))
     item_details = cursor.fetchone()
     cursor.close()
     

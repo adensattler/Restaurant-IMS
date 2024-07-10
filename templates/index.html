@@ -33,7 +33,7 @@
         <tbody>
             {% if inventory %}
             {% for item in inventory %}
-            <tr data-item-id="{{ item.item_id }}">
+            <tr data-item-id="{{ item.inventory_item_id }}">
                 <th scope="row">{{ item.name }}</th>
                 <td>{{ item.location_name }}</td>
                 <td>{{ item.stock }}</td>
@@ -49,13 +49,13 @@
                         </div>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item edit-item" data-bs-toggle="modal" data-bs-target="#editItemModal" 
-                                data-item-id="{{ item.item_id }}">Edit
+                                data-item-id="{{ item.inventory_item_id }}">Edit
                             </a>
                             <a class="dropdown-item" href="#">Duplicate</a>
                             <a class="dropdown-item" href="#">Archive</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#resetConf"
-                                data-item-name="{{ item.name }}" data-item-id="{{ item.item_id }}">Delete
+                                data-item-name="{{ item.name }}" data-item-id="{{ item.inventory_item_id }}">Delete
                             </a>
 
                         </div>

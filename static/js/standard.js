@@ -19,7 +19,7 @@ $(document).ready(function () {
             data: {editItemId: editItemId},
             success: function (response) {
                 // Populate form fields with fetched item details  
-                $('#editItemID').val(response.item_id);
+                $('#editItemID').val(response.inventory_item_id);
                 $('#editItemName').val(response.name);
                 $('#editItemDescription').val(response.description);
                 $('#editItemLocation').val(response.location_id);
