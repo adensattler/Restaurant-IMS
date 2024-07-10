@@ -144,4 +144,6 @@ SELECT * FROM MenuItems;
 SELECT * FROM InventoryItems;
 
 -- @block 
+DROP TABLE MenuItemComponents;
+DROP TABLE MenuItems;
 DROP TABLE InventoryItems;
