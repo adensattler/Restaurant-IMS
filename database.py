@@ -6,6 +6,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_db_config():
+    if current_app:
+        # We're inside a Flask application context
+        return {
+            'host': current_app.config['DB_HOST'],
+            'port': current_app.config['DB_PORT'],
+            'user': current_app.config['DB_USERNAME'],
+            'password': current_app.config['DB_PASSWORD'],
+            'database': current_app.config['DB_DATABASE']
+        }
+    else:
+        # We're outside a Flask application context (e.g., in a script)
+        return {
+            'host': os.getenv('DB_HOST'),
+            'port': os.getenv('DB_PORT'),
+            'user': os.getenv('DB_USERNAME'),
+            'password': os.getenv('DB_PASSWORD'),
+            'database': os.getenv('DB_DATABASE')
+        }
 
 def getdb():
     if 'db' not in g or not g.db.is_connected():
@@ -94,10 +113,6 @@ def add_menu_item_component(menu_item_id, inventory_item_id, quantity_required, 
         return None
     finally:
         cursor.close()
-
-
-
-
 
 def normalize_string(s):
     # First, replace smart quotes with standard quotes
