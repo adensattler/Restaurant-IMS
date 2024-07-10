@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import pytz
 import logging
-import database
+import app.database as database
 
 
 # load all environmental variables and set them as constants

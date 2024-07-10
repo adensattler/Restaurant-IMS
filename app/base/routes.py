@@ -1,3 +1,4 @@
+from . import base as app
 import app.database as database
 import json
 from os import environ as env
@@ -7,27 +8,6 @@ from authlib.integrations.flask_client import OAuth
 from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
 # from flask_login import login_required, login_user, current_user
 
-
-
-app = Flask(__name__)
-
-# load the current_app.config with the vars from .env 
-app.config.from_pyfile("config.py")
-
-# initialize the database to close database connections automatically
-database.init_app(app)
-
-oauth = OAuth(app)
-
-oauth.register(
-    "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
-)
 
 @app.route('/')
 # @login_required
@@ -190,8 +170,3 @@ def logout():
 def temp():
     return render_template("datatable.html")
     # return render_template('index.html')
-
-
-
-if __name__ == "__main__":
-    app.run(debug="True")
