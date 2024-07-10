@@ -170,7 +170,7 @@ def process_daily_orders():
     print(order_items)
 
     # Update the inventory associated with each and every menu item sold
-    database.update_inventory(database.getdbDev, order_items)
+    database.update_inventory(database.get_db, order_items)
 
 
 
@@ -179,35 +179,5 @@ def process_daily_orders():
 if __name__ == '__main__':
     process_daily_orders()
 
-    # print(database.get_menu_item_id('Rib Plate'))
-
     
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# result = client.inventory.retrieve_inventory_count(
-#   catalog_object_id = "7HOMZTAM7TD67BUTXIGWQXTV",
-#   location_ids = SQUARE_LOCATION_ID,
-# )
-
-# if result.is_success():
-#   print(result.body)
-# # elif result.is_error():
-# #   print(result.errors)
-
-# elif result.is_error():
-#     for error in result.errors:
-#         print(error['category'])
-#         print(error['code'])
-#         print(error['detail'])
