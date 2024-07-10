@@ -53,6 +53,10 @@ def close_db(e=None):
         # close the database 
         db.close()
 
+# In your Flask app setup
+def init_app(app):
+    app.teardown_appcontext(close_db)
+
 # Takes a menu item name and returns its associated ID if it exists in the database
 def get_menu_item_id(menu_item_name):
     db = getdbDev()
