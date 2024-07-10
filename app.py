@@ -17,6 +17,9 @@ app = Flask(__name__)
 # load the current_app.config with the vars from .env 
 app.config.from_pyfile("config.py")
 
+# initialize the database to close database connections automatically
+database.init_app(app)
+
 oauth = OAuth(app)
 
 oauth.register(
