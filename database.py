@@ -35,17 +35,6 @@ def get_db():
         # Create a new connection when outside Flask context
         return mysql.connector.connect(**get_db_config())
 
-def getdbDev():
-    tmp = mysql.connector.connect(
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
-        user=os.getenv('DB_USERNAME'),
-        password=os.getenv('DB_PASSWORD'),
-        database=os.getenv('DB_DATABASE')
-    )
-    return tmp
-
-
 def close_db(e=None):
     db = g.pop("db", None)
 
@@ -59,7 +48,7 @@ def init_app(app):
 
 # Takes a menu item name and returns its associated ID if it exists in the database
 def get_menu_item_id(menu_item_name):
-    db = getdbDev()
+    db = get_db()
     cursor = db.cursor(dictionary=True)
 
     # Normalize the input string
@@ -72,7 +61,7 @@ def get_menu_item_id(menu_item_name):
     return result['menu_item_id'] if result else None
 
 def get_menu_item_components(menu_item_id):
-    db = getdbDev()
+    db = get_db()
     cursor = db.cursor(dictionary=True)
     query = """
     SELECT inventory_item_id, quantity_required 
@@ -85,7 +74,7 @@ def get_menu_item_components(menu_item_id):
     return components
 
 def update_inventory_quantity(inventory_item_id, quantity_used):
-    db = getdbDev()
+    db = get_db()
     cursor = db.cursor()
     query="""
     UPDATE InventoryItems SET stock = stock - %s
@@ -97,7 +86,7 @@ def update_inventory_quantity(inventory_item_id, quantity_used):
 
 def add_menu_item_component(menu_item_id, inventory_item_id, quantity_required, unit=None):
     try:
-        db = getdbDev()
+        db = get_db()
         cursor = db.cursor()
         query="""
         INSERT INTO MenuItemComponents (menu_item_id, inventory_item_id, quantity_required, unit)
