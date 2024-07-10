@@ -35,7 +35,7 @@ oauth.register(
 @app.route('/')
 # @login_required
 def index():
-    db = database.getdb()
+    db = database.get_db()
     cursor = db.cursor(dictionary=True)
 
     query = " SELECT InventoryItems.*, Locations.location_name FROM InventoryItems JOIN Locations ON InventoryItems.location_id = Locations.location_id;"
@@ -52,7 +52,7 @@ def remove_item():
     item_id = request.form['item_id']
     print(item_id)
 
-    db = database.getdb()
+    db = database.get_db()
     cursor = db.cursor()
     cursor.execute("DELETE FROM Items WHERE item_id= %s", (item_id,))
     db.commit()
@@ -76,7 +76,7 @@ def create_item():
     item_stock = request.form['itemStock'] if request.form['itemStock'] else None
     item_low_stock_level = request.form['itemLowStockLevel'] if request.form['itemLowStockLevel'] else None
 
-    db = database.getdb()
+    db = database.get_db()
     cursor = db.cursor()
     # Execute the SQL query to insert a new item
     insert_query = """
@@ -109,7 +109,7 @@ def update_item():
     item_stock = request.form['editItemStock'] if request.form['editItemStock'] else None
     item_low_stock_threshold = request.form['editItemLowStockLevel'] if request.form['editItemLowStockLevel'] else None
 
-    db = database.getdb()
+    db = database.get_db()
     cursor = db.cursor()
 
     # Execute the SQL query to update the item
@@ -138,7 +138,7 @@ def update_item():
 def get_item_details():
     item_id = request.form.get('editItemId')
     print(item_id)
-    db = database.getdb()
+    db = database.get_db()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM Items WHERE Items.item_id = %s", (item_id,))
     item_details = cursor.fetchone()
