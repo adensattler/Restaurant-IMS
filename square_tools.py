@@ -114,7 +114,7 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     """
     # Use provided date or current date if none provided
     if date is None:
-        date = datetime.now()
+        date = datetime.today()
 
     # Define the specified time zone
     timezone = pytz.timezone(timezone_str)
@@ -136,7 +136,7 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     return start_time_rfc3339, end_time_rfc3339
 
 
-def update_inventory(orders):
+def batch_update_inventory(orders):
     for order in orders:
         menu_item_name = order['name']
         quantity = order['quantity']
@@ -174,7 +174,7 @@ def process_daily_orders():
     print(order_items)
 
     # Update the inventory associated with each and every menu item sold
-    update_inventory(order_items)
+    batch_update_inventory(order_items)
 
 
 

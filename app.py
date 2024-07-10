@@ -1,14 +1,11 @@
 import database
 import json
-
-from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
-# from flask_login import login_required, login_user, current_user
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 from helpers import login_required
-
-
 from authlib.integrations.flask_client import OAuth
+from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
+# from flask_login import login_required, login_user, current_user
 
 
 
