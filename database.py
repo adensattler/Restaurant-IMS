@@ -36,11 +36,18 @@ def get_db():
     
 
 def close_db(e=None):
-    db = g.pop("db", None)
+    global _dev_db_connection
 
-    if db is not None:
-        # close the database 
-        db.close()
+    if current_app:
+        db = g.pop("db", None)
+        if db is not None:
+            # close the database 
+            db.close()
+    else:
+        if _dev_db_connection is not None:
+            _dev_db_connection.close()
+            _dev_db_connection = None
+    
 
 # In your Flask app setup
 def init_app(app):
