@@ -6,34 +6,34 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_db_config():
-    if current_app:
-        # We're inside a Flask application context
-        return {
-            'host': current_app.config['DB_HOST'],
-            'port': current_app.config['DB_PORT'],
-            'user': current_app.config['DB_USERNAME'],
-            'password': current_app.config['DB_PASSWORD'],
-            'database': current_app.config['DB_DATABASE']
-        }
-    else:
-        # We're outside a Flask application context (e.g., in a script)
-        return {
-            'host': os.getenv('DB_HOST'),
-            'port': os.getenv('DB_PORT'),
-            'user': os.getenv('DB_USERNAME'),
-            'password': os.getenv('DB_PASSWORD'),
-            'database': os.getenv('DB_DATABASE')
-        }
+# Global variable to store the development database connection
+_dev_db_connection = None
 
 def get_db():
+    global _dev_db_connection
+
     if current_app:
         if 'db' not in g or not g.db.is_connected():
-            g.db = mysql.connector.connect(**get_db_config())
+            g.db = mysql.connector.connect(
+                host=current_app.config['DB_HOST'],
+                port=current_app.config['DB_PORT'],
+                user=current_app.config['DB_USERNAME'],
+                password=current_app.config['DB_PASSWORD'],
+                database=current_app.config['DB_DATABASE']
+            )
         return g.db
     else:
-        # Create a new connection when outside Flask context
-        return mysql.connector.connect(**get_db_config())
+        # We're outside a Flask application context (e.g., in development)
+        if not _dev_db_connection or not _dev_db_connection.is_connected():
+            _dev_db_connection = mysql.connector.connect(
+                host=os.getenv('DB_HOST'),
+                port=os.getenv('DB_PORT'),
+                user=os.getenv('DB_USERNAME'),
+                password=os.getenv('DB_PASSWORD'),
+                database=os.getenv('DB_DATABASE')
+            )
+        return _dev_db_connection
+    
 
 def close_db(e=None):
     db = g.pop("db", None)
