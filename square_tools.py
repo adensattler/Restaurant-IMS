@@ -143,6 +143,9 @@ def update_inventory(orders):
         
         # Get menu_item_id
         menu_item_id = database.get_menu_item_id(menu_item_name)
+        if menu_item_id is None:
+            print(f"Warning: Menu item '{menu_item_name}' not found")
+            continue
         
         # Get components for this menu item
         components = database.get_menu_item_components(menu_item_id)
@@ -153,7 +156,8 @@ def update_inventory(orders):
             
             # Update inventory
             database.update_inventory_quantity(inventory_item_id, quantity_required)
-
+            
+    print("Inventory updated successfully")
 
 
 def process_daily_orders():
@@ -170,7 +174,7 @@ def process_daily_orders():
     print(order_items)
 
     # Update the inventory associated with each and every menu item sold
-    database.update_inventory(database.get_db, order_items)
+    update_inventory(order_items)
 
 
 

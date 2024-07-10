@@ -118,24 +118,4 @@ def normalize_string(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
 
-def update_inventory(db, orders):
-    for order in orders:
-        menu_item_name = order['name']
-        quantity = order['quantity']
-        
-        menu_item_id = get_menu_item_id(menu_item_name)
-        if menu_item_id is None:
-            print(f"Warning: Menu item '{menu_item_name}' not found")
-            continue
-        
-        components = get_menu_item_components(menu_item_id)
-        
-        for component in components:
-            inventory_item_id = component['inventory_item_id']
-            quantity_required = component['quantity_required'] * quantity
-            
-            update_inventory_quantity(inventory_item_id, quantity_required)
-    
-    print("Inventory updated successfully")
-
 
