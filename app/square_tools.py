@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import pytz
 import logging
-import app.database as database
+import database
+from flask import current_app, g
 
 
 # load all environmental variables and set them as constants
@@ -30,7 +31,9 @@ def list_payments(date=None):
         raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
 
     try:
-        start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
+        # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
+        # start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
+        start_time_rfc3339, end_time_rfc3339 = get_start_end_times_yesterday(date)
 
         response = client.payments.list_payments(
             location_id = SQUARE_LOCATION_ID,
@@ -101,6 +104,41 @@ def extract_sold_items(response):
 
 # Primary Functions
 # -----------------------------------------------------------------------------------------------------------------------
+def get_start_end_times_yesterday(date=None, timezone_str='America/Denver'):
+    """
+    Get the start and end times in RFC 3339 format for the given date and timezone.
+    
+    Args:
+        date (datetime): The date for which to get the start and end times.
+        timezone_str (str): The time zone string (default is 'America/Denver').
+        
+    Returns:
+        tuple: A tuple containing the start and end times in RFC 3339 format.
+    """
+    # Use provided date or current date if none provided
+    if date is None:
+        date = datetime.today()
+
+    # Define the specified time zone
+    timezone = pytz.timezone(timezone_str)
+    
+    # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
+    end_time = timezone.localize(datetime(date.year, date.month, date.day))
+    
+    # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
+    start_time = end_time - timedelta(days=1)
+    
+    # Format as RFC 3339 strings with the required format
+    start_time_rfc3339 = start_time.strftime('%Y-%m-%dT%H:%M:%S%z')
+    end_time_rfc3339 = end_time.strftime('%Y-%m-%dT%H:%M:%S%z')
+    
+    # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
+    start_time_rfc3339 = start_time_rfc3339[:-2] + ':' + start_time_rfc3339[-2:]
+    end_time_rfc3339 = end_time_rfc3339[:-2] + ':' + end_time_rfc3339[-2:]
+    
+    return start_time_rfc3339, end_time_rfc3339
+
+
 def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     """
     Get the start and end times in RFC 3339 format for the given date and timezone.
@@ -181,7 +219,8 @@ def process_daily_orders():
 
 
 if __name__ == '__main__':
-    process_daily_orders()
+    print(get_start_end_times_yesterday())
+    # process_daily_orders()
 
     
 
