@@ -40,7 +40,7 @@ def get_square_client() -> Client:
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None) -> Dict[str, List[Dict]]:
     """
-    List payments for a given date range.
+    List payments for a given date range. NOTE: THIS IS THE FIRST STEP IN UPDATING INVENTORY
     Args: date (datetime): The date for which to list payments. Defaults to None.
     Returns: Dict[str, List[Dict]]: A dictionary containing a list of payments.
     Raises: Exception if there's an error in retrieving payments.
@@ -56,7 +56,7 @@ def list_payments(date=None) -> Dict[str, List[Dict]]:
     while True:
         response = client.payments.list_payments(
             location_id=os.getenv('SQUARE_LOCATION_ID'),
-            begin_time=start_time_rfc3339,
+            begin_time=start_time_rfc3339, 
             end_time=end_time_rfc3339,
             cursor=cursor
         )
@@ -120,6 +120,7 @@ def extract_order_ids(response: Dict[str, List[Dict]]) -> List[str]:
                 order_ids.append(payment['order_id'])
     return order_ids
 
+
 def extract_sold_items(response: Dict[str, List[Dict]]) -> List[Dict[str, int]]:
     """
     Extract sold items from the orders response.
@@ -149,63 +150,38 @@ def get_start_end_times_yesterday(date=None, timezone_str='America/Denver'):
     Returns:
         tuple: A tuple containing the start and end times in RFC 3339 format.
     """
-    # Use provided date or current date if none provided
-    if date is None:
-        date = datetime.today()
+    date = date or datetime.today()
+    timezone = pytz.timezone(timezone_str)      # Define the specified time zone
+    
+    end_time = timezone.localize(datetime(date.year, date.month, date.day))     # Create datetime object for the start of the NEXT day (midnight) in the specified time zone
+    start_time = end_time - timedelta(days=1)           # Create datetime object for the start of the CURRENT day (midnight) in the specified time zone
 
-    # Define the specified time zone
-    timezone = pytz.timezone(timezone_str)
-    
-    # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
-    end_time = timezone.localize(datetime(date.year, date.month, date.day))
-    
-    # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
-    start_time = end_time - timedelta(days=1)
-    
     # Format as RFC 3339 strings with the required format
-    start_time_rfc3339 = start_time.strftime('%Y-%m-%dT%H:%M:%S%z')
-    end_time_rfc3339 = end_time.strftime('%Y-%m-%dT%H:%M:%S%z')
-    
-    # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
-    start_time_rfc3339 = start_time_rfc3339[:-2] + ':' + start_time_rfc3339[-2:]
-    end_time_rfc3339 = end_time_rfc3339[:-2] + ':' + end_time_rfc3339[-2:]
-    
-    return start_time_rfc3339, end_time_rfc3339
+    return format_rfc3339(start_time), format_rfc3339(end_time)
 
 
 def get_start_end_times_today(date=None, timezone_str='America/Denver'):
     """
-    Get the start and end times in RFC 3339 format for the given date and timezone.
-    
-    Args:
-        date (datetime): The date for which to get the start and end times.
-        timezone_str (str): The time zone string (default is 'America/Denver').
-        
-    Returns:
-        tuple: A tuple containing the start and end times in RFC 3339 format.
+    Same as get_start_end_times_yesterday but for the current day (USED PRIMARILY FOR DEVELOPMENT)
     """
-    # Use provided date or current date if none provided
-    if date is None:
-        date = datetime.today()
+    date = date or datetime.today()
+    timezone = pytz.timezone(timezone_str)      # Define the specified time zone
+    
+    start_time = timezone.localize(datetime(date.year, date.month, date.day))   # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
+    end_time = start_time + timedelta(days=1)       # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
+    
+    return format_rfc3339(start_time), format_rfc3339(end_time)
 
-    # Define the specified time zone
-    timezone = pytz.timezone(timezone_str)
-    
-    # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
-    start_time = timezone.localize(datetime(date.year, date.month, date.day))
-    
-    # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
-    end_time = start_time + timedelta(days=1)
-    
-    # Format as RFC 3339 strings with the required format
-    start_time_rfc3339 = start_time.strftime('%Y-%m-%dT%H:%M:%S%z')
-    end_time_rfc3339 = end_time.strftime('%Y-%m-%dT%H:%M:%S%z')
+def format_rfc3339(dt: datetime) -> str:
+    """
+    Format a datetime object to RFC 3339 format.
+    Args: dt (datetime): The datetime object to format.
+    Returns: str: The formatted datetime string in RFC 3339 format.
+    """
+    formatted = dt.strftime('%Y-%m-%dT%H:%M:%S%z')
     
     # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
-    start_time_rfc3339 = start_time_rfc3339[:-2] + ':' + start_time_rfc3339[-2:]
-    end_time_rfc3339 = end_time_rfc3339[:-2] + ':' + end_time_rfc3339[-2:]
-    
-    return start_time_rfc3339, end_time_rfc3339
+    return f"{formatted[:-2]}:{formatted[-2:]}"     
 
 
 def batch_update_inventory(orders):
