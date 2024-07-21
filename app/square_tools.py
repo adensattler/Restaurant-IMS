@@ -18,12 +18,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-client = Client(
-    bearer_auth_credentials=BearerAuthCredentials(
-      access_token=os.getenv('SQUARE_ACCESS_TOKEN')
-    ),
-    environment='sandbox')
-
 def get_square_client():
     global _dev_square_client
 
@@ -50,6 +44,9 @@ def get_square_client():
 # SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None):
+    # get the square sdk client
+    client = get_square_client()
+
     if not SQUARE_LOCATION_ID:
         raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
 
@@ -74,6 +71,8 @@ def list_payments(date=None):
         raise
 
 def retrieve_orders(order_ids: list[str]):
+    client = get_square_client()
+    
     if not SQUARE_LOCATION_ID:
         raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
     
