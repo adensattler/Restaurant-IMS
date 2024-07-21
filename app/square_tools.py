@@ -1,21 +1,11 @@
 from square.http.auth.o_auth_2 import BearerAuthCredentials
 from square.client import Client
 import os
-from dotenv import load_dotenv
 from datetime import datetime, timezone, timedelta
 import pytz
 import logging
 import database
 from flask import current_app, g
-
-
-# load all environmental variables and set them as constants
-load_dotenv()
-SQUARE_LOCATION_ID = os.getenv('SQUARE_LOCATION_ID')
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def get_square_client():
@@ -47,16 +37,13 @@ def list_payments(date=None):
     # get the square sdk client
     client = get_square_client()
 
-    if not SQUARE_LOCATION_ID:
-        raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
-
     try:
         # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
         # start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
         start_time_rfc3339, end_time_rfc3339 = get_start_end_times_yesterday(date)
 
         response = client.payments.list_payments(
-            location_id = SQUARE_LOCATION_ID,
+            location_id = os.getenv('SQUARE_LOCATION_ID'),
             begin_time = start_time_rfc3339,
             end_time = end_time_rfc3339,
         )
@@ -73,9 +60,6 @@ def list_payments(date=None):
 def retrieve_orders(order_ids: list[str]):
     client = get_square_client()
     
-    if not SQUARE_LOCATION_ID:
-        raise ValueError("SQUARE_LOCATION_ID is not set in the environment variables.")
-    
     if not order_ids:
         print("No orders to retrieve.")
         return {"orders": []}  # Return an empty list of orders
@@ -83,7 +67,7 @@ def retrieve_orders(order_ids: list[str]):
     try:
         response = client.orders.batch_retrieve_orders(
             body = {
-                "location_id": SQUARE_LOCATION_ID,
+                "location_id": os.getenv('SQUARE_LOCATION_ID'),
                 "order_ids": order_ids
             }
         )    
