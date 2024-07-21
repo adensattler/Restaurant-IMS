@@ -1,3 +1,4 @@
+from typing import List, Dict, Optional, Tuple
 from square.http.auth.o_auth_2 import BearerAuthCredentials
 from square.client import Client
 import os
@@ -8,7 +9,11 @@ import database
 from flask import current_app, g
 
 
-def get_square_client():
+def get_square_client() -> Client:
+    """
+    Get or create a Square client instance.
+    Returns: A Square client instance.
+    """
     global _dev_square_client
 
     if current_app:
@@ -33,7 +38,13 @@ def get_square_client():
 
 # SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
-def list_payments(date=None):
+def list_payments(date=None) -> Dict[str, List[Dict]]:
+    """
+    List payments for a given date range.
+    Args: date (datetime): The date for which to list payments. Defaults to None.
+    Returns: Dict[str, List[Dict]]: A dictionary containing a list of payments.
+    Raises: Exception if there's an error in retrieving payments.
+    """
     client = get_square_client()
     all_payments = []
     cursor = None
@@ -65,6 +76,11 @@ def list_payments(date=None):
 
 
 def retrieve_orders(order_ids: list[str]):
+    """
+    Retrieve orders by their IDs.
+    Args: order_ids (List[str]): A list of order IDs to retrieve.
+    Returns: Dict[str, List[Dict]]: A dictionary containing a list of retrieved orders.
+    """
     client = get_square_client()
     
     if not order_ids:
@@ -90,9 +106,9 @@ def retrieve_orders(order_ids: list[str]):
 
 # JSON Parsing Functions
 # -----------------------------------------------------------------------------------------------------------------------
-def extract_order_ids(response):
+def extract_order_ids(response: Dict[str, List[Dict]]) -> List[str]:
     """
-    Extract all order_id values from the given Square JSON response.
+    Extract all order_id values from a provided Square JSON response (from list_payments).
     Args: response (dict): The JSON response containing payment information.
     Returns: list: A list of all order_id values found in the response.
     """
@@ -104,7 +120,12 @@ def extract_order_ids(response):
                 order_ids.append(payment['order_id'])
     return order_ids
 
-def extract_sold_items(response):
+def extract_sold_items(response: Dict[str, List[Dict]]) -> List[Dict[str, int]]:
+    """
+    Extract sold items from the orders response.
+    Args: response (Dict[str, List[Dict]]): The response containing order information.
+    Returns: List[Dict[str, int]]: A list of dictionaries containing item names and quantities.
+    """
     sold_items = []
     for order in response['orders']:
         for item in order['line_items']:
@@ -188,6 +209,14 @@ def get_start_end_times_today(date=None, timezone_str='America/Denver'):
 
 
 def batch_update_inventory(orders):
+    """
+    Update inventory based on a list of orders from extract_sold_items.
+
+    Args: orders (List[Dict[str, int]]): A list of dictionaries containing item names and quantities.
+    Returns: List[str]: Nothing if successful! A list of error messages if unsuccessful.
+    """
+    errors = []
+
     for order in orders:
         menu_item_name = order['name']
         quantity = order['quantity']
@@ -195,7 +224,7 @@ def batch_update_inventory(orders):
         # Get menu_item_id
         menu_item_id = database.get_menu_item_id(menu_item_name)
         if menu_item_id is None:
-            print(f"Warning: Menu item '{menu_item_name}' not found")
+            errors.append(f"Warning: Menu item '{menu_item_name}' not found")
             continue
         
         # Get components for this menu item
@@ -208,10 +237,17 @@ def batch_update_inventory(orders):
             # Update inventory
             database.update_inventory_quantity(inventory_item_id, quantity_required)
             
-    print("Inventory updated successfully")
+    if not errors:
+        print("Inventory updated successfully")
+    else:
+        return errors
 
 
 def process_daily_orders():
+    """
+    Process daily orders, update inventory, and log results. 
+    Primary function to update inventory daily.
+    """
     # get all the payments that occured today.
     payments_res = list_payments(date = datetime.now())
 
