@@ -1,7 +1,7 @@
 from flask import Flask
-from app.extensions import oauth
-from app.auth import init_auth
-import app.database as database  # Your custom database module
+from .extensions import oauth, scheduler
+from init_functions import init_auth, init_scheduler
+import database as database  # My custom database module
 
 
 def create_app():
@@ -9,14 +9,17 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("config")     # load the current_app.config with the vars from .env 
 
-    # Initialize extensions
+    # INITIALIZE EXTENTIONS ------------------------------------------
     oauth.init_app(app)
-    database.init_app(app)  # Initialize custom database
+    database.init_app(app)  # Initialize custom database for Flask
 
     # Initialize Auth0
     init_auth(app)
+    
+    # Initialize scheduler
+    init_scheduler(app)
 
-    # Register blueprints (if you have any)
+    # Register blueprints 
     from .base import base as base_blueprint
     app.register_blueprint(base_blueprint)
     
