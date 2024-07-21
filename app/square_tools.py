@@ -24,6 +24,29 @@ client = Client(
     ),
     environment='sandbox')
 
+def get_square_client():
+    global _dev_square_client
+
+    if current_app:
+        if 'square_client' not in g:
+            g.square_client = Client(
+                bearer_auth_credentials=BearerAuthCredentials(
+                access_token=os.getenv('SQUARE_ACCESS_TOKEN')
+                ),
+                environment=current_app.config['SQUARE_ENVIRONMENT']
+            )
+        return g.square_client
+    else:
+        if not _dev_square_client:
+            _dev_square_client = Client(
+                bearer_auth_credentials=BearerAuthCredentials(
+                access_token=os.getenv('SQUARE_ACCESS_TOKEN')
+                ),
+                environment=os.getenv('SQUARE_ENVIRONMENT', 'sandbox')
+            )
+        return _dev_square_client
+
+
 # SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None):
