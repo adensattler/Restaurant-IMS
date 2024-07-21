@@ -34,28 +34,35 @@ def get_square_client():
 # SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None):
-    # get the square sdk client
     client = get_square_client()
+    all_payments = []
+    cursor = None
 
-    try:
-        # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
-        # start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
-        start_time_rfc3339, end_time_rfc3339 = get_start_end_times_yesterday(date)
+    # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
+    # start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
+    start_time_rfc3339, end_time_rfc3339 = get_start_end_times_yesterday(date)
 
+    while True:
         response = client.payments.list_payments(
-            location_id = os.getenv('SQUARE_LOCATION_ID'),
-            begin_time = start_time_rfc3339,
-            end_time = end_time_rfc3339,
+            location_id=os.getenv('SQUARE_LOCATION_ID'),
+            begin_time=start_time_rfc3339,
+            end_time=end_time_rfc3339,
+            cursor=cursor
         )
 
         if response.is_success():
-            print(f"Successfully retrieved payments for {start_time_rfc3339} to {end_time_rfc3339}")
-            return response.body
+            payments = response.body.get('payments', [])
+            all_payments.extend(payments)
+            print(f"Successfully retrieved {len(payments)} payments for {start_time_rfc3339} to {end_time_rfc3339}")
+
+            cursor = response.body.get('cursor')
+            if not cursor:
+                break
         elif response.is_error():
             raise Exception(f"Error in list_payments: {response.errors}")
-    except Exception as e:
-        print(f"{str(e)}")
-        raise
+
+    return {'payments': all_payments}
+
 
 def retrieve_orders(order_ids: list[str]):
     client = get_square_client()
@@ -225,8 +232,8 @@ def process_daily_orders():
 
 
 if __name__ == '__main__':
-    print(get_start_end_times_yesterday())
-    # process_daily_orders()
+    # print(get_start_end_times_yesterday())
+    process_daily_orders()
 
     
 
