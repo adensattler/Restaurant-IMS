@@ -104,7 +104,7 @@ def retrieve_orders(order_ids: list[str]):
         raise
 
 
-# JSON Parsing Functions
+# JSON Parsing API Response Functions
 # -----------------------------------------------------------------------------------------------------------------------
 def extract_order_ids(response: Dict[str, List[Dict]]) -> List[str]:
     """
@@ -179,39 +179,42 @@ def format_rfc3339(dt: datetime) -> str:
     Returns: str: The formatted datetime string in RFC 3339 format.
     """
     formatted = dt.strftime('%Y-%m-%dT%H:%M:%S%z')
-    
-    # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
-    return f"{formatted[:-2]}:{formatted[-2:]}"     
+    return f"{formatted[:-2]}:{formatted[-2:]}"         # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
 
+from collections import defaultdict
 
 def batch_update_inventory(orders):
     """
-    Update inventory based on a list of orders from extract_sold_items.
+    Update DATABASE inventory based on a list of orders from extract_sold_items.
 
     Args: orders (List[Dict[str, int]]): A list of dictionaries containing item names and quantities.
     Returns: List[str]: Nothing if successful! A list of error messages if unsuccessful.
     """
     errors = []
 
+    # combine all orders for each menu item to get a total quantity used for the period
+    condensed_orders = defaultdict(int)
     for order in orders:
-        menu_item_name = order['name']
-        quantity = order['quantity']
+        condensed_orders[order['name']] += order['quantity']
+
+    # go through each menu item 
+    for menu_item_name, quantity_used in condensed_orders.items():
         
-        # Get menu_item_id
+        # Retrieve the menu item's id (menu_item_id)
         menu_item_id = database.get_menu_item_id(menu_item_name)
         if menu_item_id is None:
             errors.append(f"Warning: Menu item '{menu_item_name}' not found")
             continue
         
-        # Get components for this menu item
+        # Retrieve all components for the current menu item
         components = database.get_menu_item_components(menu_item_id)
         
         for component in components:
             inventory_item_id = component['inventory_item_id']
-            quantity_required = component['quantity_required'] * quantity
+            total_quantity_used= component['quantity_required'] * quantity_used
             
             # Update inventory
-            database.update_inventory_quantity(inventory_item_id, quantity_required)
+            database.update_inventory_quantity(inventory_item_id, total_quantity_used)
             
     if not errors:
         print("Inventory updated successfully")
@@ -240,12 +243,30 @@ def process_daily_orders():
     batch_update_inventory(order_items)
 
 
+def check_low_inventory():
+    # query database to get all inventory items where 
+    low_inventory = database.get_low_stock_items()
+
+    # parse the response and compile a list off all elements below stock
+    res = ""
+    for item in low_inventory:
+        res.join(item)
+
+    # twillio API SMS update message. 
+    # can embed a link to a route that will automatically run an ordering process (or redirect to a page that lets you)
+
+    return res
+        
+
+
+
 
 
 
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
     process_daily_orders()
+    check_low_inventory()
 
     
 

@@ -113,7 +113,7 @@ def add_menu_item_component(menu_item_id, inventory_item_id, quantity_required, 
 
 def get_low_stock_items():
     db = get_db()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
     query = """
     SELECT name FROM InventoryItems WHERE low_stock_level <= stock
     """
