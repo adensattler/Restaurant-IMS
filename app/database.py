@@ -111,6 +111,17 @@ def add_menu_item_component(menu_item_id, inventory_item_id, quantity_required, 
     finally:
         cursor.close()
 
+def get_low_stock_items():
+    db = get_db()
+    cursor = db.cursor()
+    query = """
+    SELECT name FROM InventoryItems WHERE low_stock_level <= stock
+    """
+    cursor.execute(query)
+    res = cursor.fetchall()
+    cursor.close()
+    return res
+
 def normalize_string(s):
     # First, replace smart quotes with standard quotes
     s = s.replace("’", "'").replace("‘", "'").replace('“', '"').replace('”', '"')
