@@ -33,6 +33,12 @@
     width: 60px; */
 }
 
+.low-stock-col {
+    min-width: 200px; 
+    /* max-width: 60px;
+    width: 60px; */
+}
+
 .unit-col {
     min-width: 100px; 
     /* max-width: 100px;

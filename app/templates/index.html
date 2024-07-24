@@ -8,6 +8,12 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Inventory</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
+        <div id="datatablesButtons" class="btn-group me-2">
+            <!-- DataTables buttons will be inserted here -->
+        </div>
+        <div id="datatablesSearch" class="me-2">
+            <!-- DataTables search input will be inserted here -->
+        </div>
         <div class="btn-group me-2">
             <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
             <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
@@ -19,7 +25,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table id="itemTable" class="table table-sm">
+    <!-- <table id="itemTable" class="table table-sm">
         <thead>
             <tr>
                 <th scope="col" class="first-column">Item</th>
@@ -66,6 +72,69 @@
             {% endfor %}
             {% endif %}
 
+        </tbody>
+    </table> -->
+
+
+
+    <table id="itemTable" class="table" style="width:100%">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>ID</th>
+                <th scope="col" class="first-column">Item</th>
+                <th>Description</th>
+                <th scope="col" class="location-col">Location</th>
+                <th>GTIN</th>
+                <th scope="col" class="sku-col">SKU</th>
+                <th scope="col" class="unit-col">Unit</th>
+                <th>Weight</th>
+                <th>Price</th>
+                <th scope="col" class="stock-col">Stock</th>
+                <th scope="col" class="low-stock-col">Low Stock Level</th>
+                <th scope="col" class="actions-col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if inventory %}
+            {% for item in inventory %}
+            <tr data-item-id="{{ item.inventory_item_id }}">
+                <td><input type="checkbox" class="row-select"></td>
+                <td>{{ item.inventory_item_id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.location_name }}</td>
+                <td>{{ item.GTIN }}</td>
+                <td>{{ item.SKU }}</td>
+                <td>{{ item.unit }}</td>
+                <td>{{ item.weight }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.stock }}</td>
+                <td>{{ item.low_stock_level }}</td>
+                <td>
+                    <div class="dropdown">
+                        <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <svg class="bi">
+                                <use xlink:href="#three-dots"></use>
+                            </svg>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item edit-item" data-bs-toggle="modal" data-bs-target="#editItemModal" 
+                                data-item-id="{{ item.inventory_item_id }}">Edit
+                            </a>
+                            <a class="dropdown-item" href="#">Duplicate</a>
+                            <a class="dropdown-item" href="#">Archive</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#resetConf"
+                                data-item-name="{{ item.name }}" data-item-id="{{ item.inventory_item_id }}">Delete
+                            </a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
         </tbody>
     </table>
 </div>
@@ -126,59 +195,69 @@
 
                         <h5 class="modal-title">Details</h5>
 
-                        <input type="hidden" type="text" id="itemID" name="itemID" class="form-control" value=""/>
+                        <input type="hidden" type="text" id="itemID" name="itemID" class="form-control" value="" />
 
                         <div class="mb-3">
                             <label>Name</label>
-                            <input type="text" id="itemName" name="itemName" placeholder="Name" class="form-control" value=""/>
+                            <input type="text" id="itemName" name="itemName" placeholder="Name" class="form-control"
+                                value="" />
                         </div>
 
                         <div class="mb-3">
                             <label for="itemDescription">Description</label>
-                            <textarea id="itemDescription" name="itemDescription" placeholder="Description" class="form-control"></textarea>
+                            <textarea id="itemDescription" name="itemDescription" placeholder="Description"
+                                class="form-control"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="itemLocation">Location</label>
-                            <input id="itemLocation" name="itemLocation" placeholder="Item Location" class="form-control">
+                            <input id="itemLocation" name="itemLocation" placeholder="Item Location"
+                                class="form-control">
                         </div>
-                        
-                        
+
+
                         <div class="mb-3">
                             <label for="itemGTIN">GTIN</label>
-                            <input type="text" id="itemGTIN" name="itemGTIN" placeholder="GTIN" class="form-control" value=""/>
+                            <input type="text" id="itemGTIN" name="itemGTIN" placeholder="GTIN" class="form-control"
+                                value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="itemSKU">SKU</label>
-                            <input type="text" id="itemSKU" name="itemSKU" placeholder="SKU" class="form-control" value=""/>
+                            <input type="text" id="itemSKU" name="itemSKU" placeholder="SKU" class="form-control"
+                                value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="itemUnit">Unit</label>
-                            <input type="text" id="itemUnit" name="itemUnit" placeholder="Unit" class="form-control" value=""/>
+                            <input type="text" id="itemUnit" name="itemUnit" placeholder="Unit" class="form-control"
+                                value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="itemWeight">Weight</label>
-                            <input type="text" id="itemWeight" name="itemWeight" placeholder="Weight" class="form-control" value=""/>
+                            <input type="text" id="itemWeight" name="itemWeight" placeholder="Weight"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemPrice">Price</label>
-                            <input type="text" id="itemPrice" name="itemPrice" placeholder="Price" class="form-control" value=""/>
+                            <input type="text" id="itemPrice" name="itemPrice" placeholder="Price" class="form-control"
+                                value="" />
                         </div>
 
                         <h5>Manage Stock</h5>
-                        
+
                         <div class="mb-3">
                             <label for="itemStock">Stock</label>
-                            <input type="text" id="itemStock" name="itemStock" placeholder="Stock" class="form-control" value=""/>
+                            <input type="text" id="itemStock" name="itemStock" placeholder="Stock" class="form-control"
+                                value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="itemLowStockLevel">Low Stock Level</label>
-                            <input type="text" id="itemLowStockLevel" name="itemLowStockLevel" placeholder="Low Stock Level" class="form-control" value=""/>
+                            <input type="text" id="itemLowStockLevel" name="itemLowStockLevel"
+                                placeholder="Low Stock Level" class="form-control" value="" />
                         </div>
                     </div>
                 </div>
@@ -208,59 +287,70 @@
 
                         <h5 class="modal-title">Details</h5>
 
-                        <input type="hidden" type="text" id="editItemID" name="editItemID" class="form-control" value=""/>
+                        <input type="hidden" type="text" id="editItemID" name="editItemID" class="form-control"
+                            value="" />
 
                         <div class="mb-3">
                             <label>Name</label>
-                            <input type="text" id="editItemName" name="editItemName" placeholder="Name" class="form-control" value=""/>
+                            <input type="text" id="editItemName" name="editItemName" placeholder="Name"
+                                class="form-control" value="" />
                         </div>
 
                         <div class="mb-3">
                             <label for="editItemDescription">Description</label>
-                            <textarea id="editItemDescription" name="editItemDescription" placeholder="Description" class="form-control"></textarea>
+                            <textarea id="editItemDescription" name="editItemDescription" placeholder="Description"
+                                class="form-control"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="editItemLocation">Location</label>
-                            <input id="editItemLocation" name="editItemLocation" placeholder="Item Location" class="form-control">
+                            <input id="editItemLocation" name="editItemLocation" placeholder="Item Location"
+                                class="form-control">
                         </div>
-                        
-                        
+
+
                         <div class="mb-3">
                             <label for="editItemGTIN">GTIN</label>
-                            <input type="text" id="editItemGTIN" name="editItemGTIN" placeholder="GTIN" class="form-control" value=""/>
+                            <input type="text" id="editItemGTIN" name="editItemGTIN" placeholder="GTIN"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemSKU">SKU</label>
-                            <input type="text" id="editItemSKU" name="editItemSKU" placeholder="SKU" class="form-control" value=""/>
+                            <input type="text" id="editItemSKU" name="editItemSKU" placeholder="SKU"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemUnit">Unit</label>
-                            <input type="text" id="editItemUnit" name="editItemUnit" placeholder="Unit" class="form-control" value=""/>
+                            <input type="text" id="editItemUnit" name="editItemUnit" placeholder="Unit"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemWeight">Weight</label>
-                            <input type="text" id="editItemWeight" name="editItemWeight" placeholder="Weight" class="form-control" value=""/>
+                            <input type="text" id="editItemWeight" name="editItemWeight" placeholder="Weight"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemPrice">Price</label>
-                            <input type="text" id="editItemPrice" name="editItemPrice" placeholder="Price" class="form-control" value=""/>
+                            <input type="text" id="editItemPrice" name="editItemPrice" placeholder="Price"
+                                class="form-control" value="" />
                         </div>
 
                         <h5>Manage Stock</h5>
-                        
+
                         <div class="mb-3">
                             <label for="editItemStock">Stock</label>
-                            <input type="text" id="editItemStock" name="editItemStock" placeholder="Stock" class="form-control" value=""/>
+                            <input type="text" id="editItemStock" name="editItemStock" placeholder="Stock"
+                                class="form-control" value="" />
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="editItemLowStockLevel">Low Stock Level</label>
-                            <input type="text" id="editItemLowStockLevel" name="editItemLowStockLevel" placeholder="Low Stock Level" class="form-control" value=""/>
+                            <input type="text" id="editItemLowStockLevel" name="editItemLowStockLevel"
+                                placeholder="Low Stock Level" class="form-control" value="" />
                         </div>
                     </div>
                 </div>
@@ -292,4 +382,40 @@
 
 <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas> -->
 
+
+
+<!-- Bootstrap & jQuery JS -->
+<!-- jQuery (must be first) -->
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<!-- JSZip for Excel button -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.js"></script>
+
+<!-- DataTables Core -->
+<script src="https://cdn.datatables.net/2.0.5/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.0.5/js/dataTables.bootstrap5.js"></script>
+
+<!-- DataTables Buttons -->
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.js"></script>
+
+<!-- Other DataTables plugins -->
+<script src="https://cdn.datatables.net/autofill/2.7.0/js/dataTables.autoFill.js"></script>
+<script src="https://cdn.datatables.net/autofill/2.7.0/js/autoFill.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/colreorder/2.0.1/js/dataTables.colReorder.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/4.0.1/js/dataTables.fixedHeader.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.5.0/js/dataTables.rowGroup.js"></script>
+<script src="https://cdn.datatables.net/searchpanes/2.3.1/js/dataTables.searchPanes.js"></script>
+<script src="https://cdn.datatables.net/searchpanes/2.3.1/js/searchPanes.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/select/2.0.1/js/dataTables.select.js"></script>
+<script src="https://cdn.datatables.net/staterestore/1.4.1/js/dataTables.stateRestore.js"></script>
+<script src="https://cdn.datatables.net/staterestore/1.4.1/js/stateRestore.bootstrap5.js"></script>
+<!-- DataTables Concat (as above) -->
+<!-- <script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.0.5/af-2.7.0/b-3.0.2/b-colvis-3.0.2/b-html5-3.0.2/cr-2.0.1/date-1.5.2/fh-4.0.1/rg-1.5.0/rr-1.5.0/sb-1.7.1/sp-2.3.1/sl-2.0.1/sr-1.4.1/datatables.min.js"></script> -->
+
+<!-- Custom JS Links-->
+<script defer src="../static/js/datatable.js"></script>
 {% endblock %}
