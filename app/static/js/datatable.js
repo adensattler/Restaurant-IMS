@@ -11,7 +11,7 @@ $(document).ready(function() {
     console.log("Document ready function started");
 
     var table = new DataTable('#itemTable', {
-        paging: true,
+        paging: false,
         colReorder: true,
         select: {
             style: 'os',
