@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timezone, timedelta
 import pytz
 import logging
-import database
+from . import database
 from flask import current_app, g
 
 

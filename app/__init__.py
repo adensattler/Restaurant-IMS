@@ -1,7 +1,7 @@
 from flask import Flask
 from .extensions import oauth, scheduler
-from init_functions import init_auth, init_scheduler
-import database as database  # My custom database module
+from .init_functions import init_auth, init_scheduler
+from . import database  # My custom database module
 
 
 def create_app():
