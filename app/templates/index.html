@@ -46,17 +46,17 @@
             {% for item in inventory %}
             <tr data-item-id="{{ item.inventory_item_id }}">
                 <td><input type="checkbox" class="row-select"></td>
-                <td>{{ item.inventory_item_id }}</td>
-                <td>{{ item.name }}</td>
-                <td>{{ item.description }}</td>
-                <td>{{ item.location_name }}</td>
-                <td>{{ item.GTIN }}</td>
-                <td>{{ item.SKU }}</td>
-                <td>{{ item.unit }}</td>
-                <td>{{ item.weight }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.stock }}</td>
-                <td>{{ item.low_stock_level }}</td>
+                <td>{{ item.inventory_item_id|none_to_empty }}</td>
+                <td>{{ item.name|none_to_empty }}</td>
+                <td>{{ item.description|none_to_empty }}</td>
+                <td>{{ item.location_name|none_to_empty }}</td>
+                <td>{{ item.GTIN|none_to_empty }}</td>
+                <td>{{ item.SKU|none_to_empty }}</td>
+                <td>{{ item.unit|none_to_empty }}</td>
+                <td>{{ item.weight|none_to_empty }}</td>
+                <td>{{ item.price|none_to_empty }}</td>
+                <td>{{ item.stock|none_to_empty }}</td>
+                <td>{{ item.low_stock_level|none_to_empty }}</td>
                 <td>
                     <div class="dropdown">
                         <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"
