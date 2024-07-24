@@ -61,3 +61,25 @@
 #dropdownMenuButton:hover {
     cursor: pointer;
 }
+
+
+/* Default button style */
+.dt-buttons .btn {
+    background-color: white; /* Set background color to white */
+    color: grey;            /* Set text color to black */
+    border-color: grey;      /* Set border color */
+}
+
+/* Button hover style */
+.dt-buttons .btn:hover {
+    background-color: grey;  /* Set background color to grey on hover */
+    color: white;            /* Set text color to white on hover */
+    border-color: grey;      /* Keep border color grey on hover */
+}
+
+/* Active button style */
+.dt-buttons .btn:active {
+    background-color: grey;  /* Set background color to grey when active */
+    color: white;            /* Set text color to white when active */
+    border-color: grey;      /* Keep border color grey when active */
+}

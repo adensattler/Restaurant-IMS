@@ -43,19 +43,9 @@ $(document).ready(function() {
             },
             {
                 extend: 'excel',
-                text: 'Excel',
+                text: 'Export',
                 className: 'btn btn-sm btn-outline-secondary'
             },
-            {
-                extend: 'pdf',
-                text: 'PDF',
-                className: 'btn btn-sm btn-outline-secondary'
-            },
-            {
-                extend: 'print',
-                text: 'Print',
-                className: 'btn btn-sm btn-outline-secondary'
-            }
         ],
         dom: 'lrtip' // This removes the default button and search placement
     });
@@ -64,11 +54,12 @@ $(document).ready(function() {
     table.buttons().container().appendTo('#datatablesButtons');
 
     // Create and move search input to the custom placeholder
-    $('#datatablesSearch').html('<input type="search" class="form-control form-control-sm" placeholder="Search...">');
+    $('#datatablesSearch').html('<input class="form-control mr-sm-2" type="search" placeholder="Search..." aria-label="Search">');
+    
 
     $('#datatablesSearch input').on('keyup', function() {
         table.search(this.value).draw();
     });
 
-    // ... (rest of your code for select all functionality)
+    // ... (rest of code for select all functionality)
 });

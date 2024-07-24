@@ -8,15 +8,12 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Inventory</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <div id="datatablesButtons" class="btn-group me-2">
-            <!-- DataTables buttons will be inserted here -->
-        </div>
+        
         <div id="datatablesSearch" class="me-2">
             <!-- DataTables search input will be inserted here -->
         </div>
-        <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        <div id="datatablesButtons" class="btn-group me-2">
+            <!-- DataTables buttons will be inserted here -->
         </div>
         <!-- Create item modal -->
         <button type="button" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="modal"
@@ -25,57 +22,6 @@
     </div>
 </div>
 <div class="table-responsive">
-    <!-- <table id="itemTable" class="table table-sm">
-        <thead>
-            <tr>
-                <th scope="col" class="first-column">Item</th>
-                <th scope="col" class="location-col">Location</th>
-                <th scope="col" class="stock-col">Stock</th>
-                <th scope="col" class="unit-col">Unit</th>
-                <th scope="col" class="sku-col">SKU</th>
-                <th scope="col" class="actions-col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if inventory %}
-            {% for item in inventory %}
-            <tr data-item-id="{{ item.inventory_item_id }}">
-                <th scope="row">{{ item.name }}</th>
-                <td>{{ item.location_name }}</td>
-                <td>{{ item.stock }}</td>
-                <td>{{ item.unit }}</td>
-                <td>{{ item.SKU }}</td>
-                <td>
-                    <div class="dropdown">
-                        <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <svg class="bi">
-                                <use xlink:href="#three-dots"></use>
-                            </svg>
-                        </div>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item edit-item" data-bs-toggle="modal" data-bs-target="#editItemModal" 
-                                data-item-id="{{ item.inventory_item_id }}">Edit
-                            </a>
-                            <a class="dropdown-item" href="#">Duplicate</a>
-                            <a class="dropdown-item" href="#">Archive</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#resetConf"
-                                data-item-name="{{ item.name }}" data-item-id="{{ item.inventory_item_id }}">Delete
-                            </a>
-
-                        </div>
-                    </div>
-
-                </td>
-            </tr>
-            {% endfor %}
-            {% endif %}
-
-        </tbody>
-    </table> -->
-
-
 
     <table id="itemTable" class="table" style="width:100%">
         <thead>
@@ -362,25 +308,6 @@
 
 <br>
 <br>
-
-<!-- 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
-            <svg class="bi">
-                <use xlink:href="#calendar3" />
-            </svg>
-            This week
-        </button>
-    </div>
-</div>
-
-<canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas> -->
 
 
 
