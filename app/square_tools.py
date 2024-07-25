@@ -243,27 +243,47 @@ def process_daily_orders():
 def check_low_inventory():
     # query database to get all inventory items where 
     low_inventory = database.get_low_stock_items()
-
+    print(low_inventory)
     # parse the response and compile a list off all elements below stock
-    res = ""
+    if not low_inventory:
+        return "No items are currently below their low stock level."
+
+    formatted_list = "Items below low stock level:\n\n"
     for item in low_inventory:
-        res.join(item)
+        formatted_list += f"- {item['name']}:\n"
+        formatted_list += f"  Current stock: {item['stock']}\n"
+        formatted_list += f"  Low stock level: {item['low_stock_level']}\n"
+        formatted_list += f"  Deficit: {item['low_stock_level'] - item['stock']:.2f}\n\n"
+    print(formatted_list.strip())
 
     # twillio API SMS update message. 
     # can embed a link to a route that will automatically run an ordering process (or redirect to a page that lets you)
-
-    return res
-        
-
-
+    
+    
+    return formatted_list.strip()
 
 
+def send_low_stock_sms(message_body=None):
+    from twilio.rest import Client
+
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+    from_='+18669864256',
+    body='Hello from Twilio',
+    to=os.getenv('TWILIO_TARGET_NUMBER')
+    )
+
+    print(message.sid)
 
 
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
-    process_daily_orders()
-    check_low_inventory()
+    # process_daily_orders()
+    # check_low_inventory()
+    send_low_stock_sms()
 
     
 

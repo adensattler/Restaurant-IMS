@@ -115,7 +115,7 @@ def get_low_stock_items():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     query = """
-    SELECT name FROM InventoryItems WHERE low_stock_level <= stock
+    SELECT name, stock, low_stock_level FROM InventoryItems where stock < low_stock_level
     """
     cursor.execute(query)
     res = cursor.fetchall()
