@@ -4,10 +4,13 @@ from square.client import Client
 import os
 from datetime import datetime, timezone, timedelta
 import pytz
+from collections import defaultdict
 import logging
-from . import database
+import database
 from flask import current_app, g
 
+# Global variable to store the square client
+_dev_square_client = None
 
 def get_square_client() -> Client:
     """
@@ -50,8 +53,7 @@ def list_payments(date=None) -> Dict[str, List[Dict]]:
     cursor = None
 
     # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
-    # start_time_rfc3339, end_time_rfc3339 = get_start_end_times_today(date)
-    start_time_rfc3339, end_time_rfc3339 = get_start_end_times_yesterday(date)
+    start_time_rfc3339, end_time_rfc3339 = get_daily_start_end_times(date, today=True)
 
     while True:
         response = client.payments.list_payments(
@@ -139,7 +141,7 @@ def extract_sold_items(response: Dict[str, List[Dict]]) -> List[Dict[str, int]]:
 
 # Primary Functions
 # -----------------------------------------------------------------------------------------------------------------------
-def get_start_end_times_yesterday(date=None, timezone_str='America/Denver'):
+def get_daily_start_end_times(date=None, timezone_str='America/Denver', today=False):
     """
     Get the start and end times in RFC 3339 format for the given date and timezone.
     
@@ -152,25 +154,18 @@ def get_start_end_times_yesterday(date=None, timezone_str='America/Denver'):
     """
     date = date or datetime.today()
     timezone = pytz.timezone(timezone_str)      # Define the specified time zone
-    
-    end_time = timezone.localize(datetime(date.year, date.month, date.day))     # Create datetime object for the start of the NEXT day (midnight) in the specified time zone
-    start_time = end_time - timedelta(days=1)           # Create datetime object for the start of the CURRENT day (midnight) in the specified time zone
+
+    # Get the start and end times for either yesterday or today (today is for development)
+    if today:
+        start_time = timezone.localize(datetime(date.year, date.month, date.day))   # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
+        end_time = start_time + timedelta(days=1)       # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
+    else:
+        end_time = timezone.localize(datetime(date.year, date.month, date.day))     # Create datetime object for the start of the NEXT day (midnight) in the specified time zone
+        start_time = end_time - timedelta(days=1)           # Create datetime object for the start of the CURRENT day (midnight) in the specified time zone
 
     # Format as RFC 3339 strings with the required format
     return format_rfc3339(start_time), format_rfc3339(end_time)
 
-
-def get_start_end_times_today(date=None, timezone_str='America/Denver'):
-    """
-    Same as get_start_end_times_yesterday but for the current day (USED PRIMARILY FOR DEVELOPMENT)
-    """
-    date = date or datetime.today()
-    timezone = pytz.timezone(timezone_str)      # Define the specified time zone
-    
-    start_time = timezone.localize(datetime(date.year, date.month, date.day))   # Create datetime objects for the start of the CURRENT day (midnight) in the specified time zone
-    end_time = start_time + timedelta(days=1)       # Create datetime objects for the start of the NEXT day (midnight) in the specified time zone
-    
-    return format_rfc3339(start_time), format_rfc3339(end_time)
 
 def format_rfc3339(dt: datetime) -> str:
     """
@@ -181,7 +176,6 @@ def format_rfc3339(dt: datetime) -> str:
     formatted = dt.strftime('%Y-%m-%dT%H:%M:%S%z')
     return f"{formatted[:-2]}:{formatted[-2:]}"         # Insert the colon in the timezone offset (strftime %z formats UTC offset as without the colon. ex: -0600)
 
-from collections import defaultdict
 
 def batch_update_inventory(orders):
     """
