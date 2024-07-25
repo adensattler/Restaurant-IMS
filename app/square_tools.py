@@ -6,8 +6,11 @@ from datetime import datetime, timezone, timedelta
 import pytz
 from collections import defaultdict
 import logging
-import database
 from flask import current_app, g
+try:
+    from . import database
+except ImportError:
+    import database
 
 # Global variable to store the square client
 _dev_square_client = None
