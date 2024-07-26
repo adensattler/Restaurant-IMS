@@ -6,6 +6,10 @@ from datetime import datetime, timezone, timedelta
 import pytz
 from collections import defaultdict
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from flask import current_app, g
 try:
     from . import database
@@ -247,20 +251,82 @@ def check_low_inventory():
     # parse the response and compile a list off all elements below stock
     if not low_inventory:
         return "No items are currently below their low stock level."
+    
 
-    formatted_list = "Items below low stock level:\n\n"
+    html_body = """
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; }
+                h1 { color: #0066cc; text-align: center; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background-color: #0066cc; color: white; }
+                tr:nth-child(even) { background-color: #f2f2f2; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Saucy's Low Stock Items Report</h1>
+                <table>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Current Stock</th>
+                        <th>Need to Order</th>
+                    </tr>
+    """
+
     for item in low_inventory:
-        formatted_list += f"- {item['name']}:\n"
-        formatted_list += f"  Current stock: {item['stock']}\n"
-        formatted_list += f"  Low stock level: {item['low_stock_level']}\n"
-        formatted_list += f"  Deficit: {item['low_stock_level'] - item['stock']:.2f}\n\n"
-    print(formatted_list.strip())
+        html_body += f"""
+                <tr>
+                    <td>{item['name']}</td>
+                    <td>{item['stock']}</td>
+                    <td>{item['low_stock_level'] - item['stock']}</td>
+                </tr>
+        """
 
-    # twillio API SMS update message. 
-    # can embed a link to a route that will automatically run an ordering process (or redirect to a page that lets you)
+    html_body += """
+            </table>
+        </div>
+    </body>
+    </html>
+    """
+
+    # Create a MIME multipart message
+    msg = MIMEMultipart()
+    msg['Subject'] = "Low Stock Items Report"
+
+    # Attach the HTML content
+    msg.attach(MIMEText(html_body, 'html'))
+
+    # Here you would use your email sending function, passing 'msg' instead of just the body
+    print(send_low_stock_email(msg))
     
-    
-    return formatted_list.strip()
+    return html_body
+
+  
+
+
+def send_low_stock_email(msg):
+    # Email configuration
+    sender_email = os.getenv("SENDER_EMAIL")
+    receiver_email = os.getenv("RECEIVER_EMAIL")
+    password = os.getenv("GOOGLE_APP_PASSWORD")
+
+    # Update the message with sender and receiver
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+
+    # Create SMTP session
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:  # Example for Gmail
+            server.starttls()  # Enable security
+            server.login(sender_email, password)
+            server.send_message(msg)
+        return "Email sent successfully"
+    except Exception as e:
+        return f"Failed to send email: {str(e)}"
 
 
 def send_low_stock_sms(message_body=None):
@@ -282,8 +348,8 @@ def send_low_stock_sms(message_body=None):
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
     # process_daily_orders()
-    # check_low_inventory()
-    send_low_stock_sms()
+    check_low_inventory()
+    # send_low_stock_email()
 
     
 
