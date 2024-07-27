@@ -35,7 +35,6 @@
                 <th scope="col" class="sku-col">SKU</th>
                 <th scope="col" class="stock-col">Stock</th>
                 <th scope="col" class="low-stock-col">Low Stock Level</th>
-                <th scope="col" class="unit-col">Unit</th>                
                 <th>Price</th>
                 <th>Weight</th>
                 <th scope="col" class="actions-col"></th>
@@ -54,8 +53,7 @@
                 <td>{{ item.SKU|none_to_empty }}</td>
                 <td>{{ item.stock|none_to_empty }}</td>
                 <td>{{ item.low_stock_level|none_to_empty }}</td>
-                <td>{{ item.unit|none_to_empty }}</td>
-                <td>{{ item.price|none_to_empty_price }}</td>
+                <td>{{ item.price|none_to_empty_price(item.unit) }}</td>
                 <td>{{ item.weight|none_to_empty }}</td>
                 <td>
                     <div class="dropdown">

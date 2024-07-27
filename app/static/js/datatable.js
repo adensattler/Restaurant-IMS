@@ -29,7 +29,7 @@ $(document).ready(function() {
             },
             // Hide some columns by default
             {
-                targets: [1, 3, 5, 6, 8, 11],
+                targets: [1, 3, 5, 6, 8, 10],
                 visible: false
             }
         ],
