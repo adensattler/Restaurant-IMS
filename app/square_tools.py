@@ -243,67 +243,31 @@ def process_daily_orders():
     # Update the inventory associated with each and every menu item sold
     batch_update_inventory(order_items)
 
-
+from jinja2 import Environment, FileSystemLoader
 def check_low_inventory():
     # query database to get all inventory items where 
     low_inventory = database.get_low_stock_items()
     print(low_inventory)
+
     # parse the response and compile a list off all elements below stock
     if not low_inventory:
         return "No items are currently below their low stock level."
-    
 
-    html_body = """
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; }
-                h1 { color: #0066cc; text-align: center; }
-                table { width: 100%; border-collapse: collapse; }
-                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-                th { background-color: #0066cc; color: white; }
-                tr:nth-child(even) { background-color: #f2f2f2; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Saucy's Low Stock Items Report</h1>
-                <table>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Current Stock</th>
-                        <th>Need to Order</th>
-                    </tr>
-    """
-
-    for item in low_inventory:
-        html_body += f"""
-                <tr>
-                    <td>{item['name']}</td>
-                    <td>{item['stock']}</td>
-                    <td>{item['low_stock_level'] - item['stock']}</td>
-                </tr>
-        """
-
-    html_body += """
-            </table>
-        </div>
-    </body>
-    </html>
-    """
+    # Set up Jinja2 environment
+    env = Environment(loader=FileSystemLoader('app/templates'))
+    template = env.get_template('email_template.html')
+    html_body = template.render(items=low_inventory)    # Render the HTML template with the low inventory items
 
     # Create a MIME multipart message
     msg = MIMEMultipart()
     msg['Subject'] = "Low Stock Items Report"
+    msg.attach(MIMEText(html_body, 'html'))         # Attach the HTML content
 
-    # Attach the HTML content
-    msg.attach(MIMEText(html_body, 'html'))
-
-    # Here you would use your email sending function, passing 'msg' instead of just the body
-    print(send_low_stock_email(msg))
+    # call the send email function with your message!!!
+    result = send_low_stock_email(msg)
+    print(result)
     
-    return html_body
+    return "Low stock email sent."
 
   
 
