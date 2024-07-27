@@ -33,11 +33,11 @@
                 <th scope="col" class="location-col">Location</th>
                 <th>GTIN</th>
                 <th scope="col" class="sku-col">SKU</th>
-                <th scope="col" class="unit-col">Unit</th>
-                <th>Weight</th>
-                <th>Price</th>
                 <th scope="col" class="stock-col">Stock</th>
                 <th scope="col" class="low-stock-col">Low Stock Level</th>
+                <th scope="col" class="unit-col">Unit</th>                
+                <th>Price</th>
+                <th>Weight</th>
                 <th scope="col" class="actions-col"></th>
             </tr>
         </thead>
@@ -52,11 +52,11 @@
                 <td>{{ item.location_name|none_to_empty }}</td>
                 <td>{{ item.GTIN|none_to_empty }}</td>
                 <td>{{ item.SKU|none_to_empty }}</td>
-                <td>{{ item.unit|none_to_empty }}</td>
-                <td>{{ item.weight|none_to_empty }}</td>
-                <td>{{ item.price|none_to_empty }}</td>
                 <td>{{ item.stock|none_to_empty }}</td>
                 <td>{{ item.low_stock_level|none_to_empty }}</td>
+                <td>{{ item.unit|none_to_empty }}</td>
+                <td>{{ item.price|none_to_empty_price }}</td>
+                <td>{{ item.weight|none_to_empty }}</td>
                 <td>
                     <div class="dropdown">
                         <div class="dropdown-toggle hide-dropdown-arrow" id="dropdownMenuButton"
