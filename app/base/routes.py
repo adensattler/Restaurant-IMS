@@ -23,6 +23,9 @@ def index():
     cursor.close()
     return render_template('index.html', inventory=inventory)
 
+@base.route('/assistant')
+def assistant():
+    return render_template('assistant.html')
 
 
 @base.route('/removeitem', methods=['POST'])
