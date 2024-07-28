@@ -9,6 +9,7 @@ import logging
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from jinja2 import Environment, FileSystemLoader
 
 from flask import current_app, g
 try:
@@ -16,8 +17,13 @@ try:
 except ImportError:
     import database
 
-# Global variable to store the square client
-_dev_square_client = None
+# CONSTANTS
+IS_DEV = True
+
+
+# GET SQUARE CLIENT
+# -----------------------------------------------------------------------------------------------------------------------
+_dev_square_client = None   # Global variable to store the square client
 
 def get_square_client() -> Client:
     """
@@ -46,6 +52,69 @@ def get_square_client() -> Client:
         return _dev_square_client
 
 
+# LOW INVENTORY REPORTING FUNCTIONS
+# -----------------------------------------------------------------------------------------------------------------------
+def check_low_inventory():
+    # query database to get all inventory items where 
+    low_inventory = database.get_low_stock_items()
+    print(low_inventory)
+
+    # parse the response and compile a list off all elements below stock
+    if not low_inventory:
+        return "No items are currently below their low stock level."
+
+    # Set up Jinja2 environment
+    env = Environment(loader=FileSystemLoader('app/templates'))
+    template = env.get_template('email_template.html')
+    html_body = template.render(items=low_inventory)    # Render the HTML template with the low inventory items
+
+    # Create a MIME multipart message
+    msg = MIMEMultipart()
+    msg['Subject'] = "Low Stock Items Report"
+    msg.attach(MIMEText(html_body, 'html'))         # Attach the HTML content
+
+    # call the send email function with your message!!!
+    result = send_low_stock_email(msg)
+    print(result)
+    
+    return "Low stock email sent."
+
+def send_low_stock_email(msg):
+    # Email configuration
+    sender_email = os.getenv("SENDER_EMAIL")
+    receiver_email = os.getenv("RECEIVER_EMAIL")
+    password = os.getenv("GOOGLE_APP_PASSWORD")
+
+    # Update the message with sender and receiver
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+
+    # Create SMTP session
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:  # Example for Gmail
+            server.starttls()  # Enable security
+            server.login(sender_email, password)
+            server.send_message(msg)
+        return "Email sent successfully"
+    except Exception as e:
+        return f"Failed to send email: {str(e)}"
+
+def send_low_stock_sms(message_body=None):
+    from twilio.rest import Client
+
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+    from_='+18669864256',
+    body='Hello from Twilio',
+    to=os.getenv('TWILIO_TARGET_NUMBER')
+    )
+
+    print(message.sid)
+
+
 # SQUARE API CALL FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def list_payments(date=None) -> Dict[str, List[Dict]]:
@@ -60,7 +129,7 @@ def list_payments(date=None) -> Dict[str, List[Dict]]:
     cursor = None
 
     # NOTE: SWITCH DATE RANGE TO TODAY OR YESTERDAY (helps with PROD vs DEV)
-    start_time_rfc3339, end_time_rfc3339 = get_daily_start_end_times(date, today=True)
+    start_time_rfc3339, end_time_rfc3339 = get_daily_start_end_times(date, today=IS_DEV)
 
     while True:
         response = client.payments.list_payments(
@@ -127,6 +196,7 @@ def extract_order_ids(response: Dict[str, List[Dict]]) -> List[str]:
         for payment in response['payments']:
             if 'order_id' in payment:
                 order_ids.append(payment['order_id'])
+    print(f"{order_ids}\n")
     return order_ids
 
 
@@ -143,10 +213,11 @@ def extract_sold_items(response: Dict[str, List[Dict]]) -> List[Dict[str, int]]:
                 'name': item['name'],
                 'quantity': int(item['quantity'])
             })
+    print(f"{sold_items}\n")
     return sold_items
    
 
-# Primary Functions
+# PRIMARY FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
 def get_daily_start_end_times(date=None, timezone_str='America/Denver', today=False):
     """
@@ -223,6 +294,7 @@ def batch_update_inventory(orders):
         return errors
 
 
+# DRIVER FUNCTION
 def process_daily_orders():
     """
     Process daily orders, update inventory, and log results. 
@@ -230,87 +302,23 @@ def process_daily_orders():
     """
     print(f"Process daily orders run at {datetime.now()}")
 
-    # get all the payments that occured today.
+    # get all the payments that occured yesterday (or today for dev testing).
     payments_res = list_payments(date = datetime.now())
 
     # Extract all order_id values from all payments
     order_ids = extract_order_ids(payments_res)
-    print(order_ids)
 
     # Retrieve all item names from every order
     response = retrieve_orders(order_ids)
     order_items = extract_sold_items(response)
-    print(order_items)
 
     # Update the inventory associated with each and every menu item sold
     batch_update_inventory(order_items)
 
-from jinja2 import Environment, FileSystemLoader
-def check_low_inventory():
-    # query database to get all inventory items where 
-    low_inventory = database.get_low_stock_items()
-    print(low_inventory)
-
-    # parse the response and compile a list off all elements below stock
-    if not low_inventory:
-        return "No items are currently below their low stock level."
-
-    # Set up Jinja2 environment
-    env = Environment(loader=FileSystemLoader('app/templates'))
-    template = env.get_template('email_template.html')
-    html_body = template.render(items=low_inventory)    # Render the HTML template with the low inventory items
-
-    # Create a MIME multipart message
-    msg = MIMEMultipart()
-    msg['Subject'] = "Low Stock Items Report"
-    msg.attach(MIMEText(html_body, 'html'))         # Attach the HTML content
-
-    # call the send email function with your message!!!
-    result = send_low_stock_email(msg)
-    print(result)
-    
-    return "Low stock email sent."
-
-  
 
 
-def send_low_stock_email(msg):
-    # Email configuration
-    sender_email = os.getenv("SENDER_EMAIL")
-    receiver_email = os.getenv("RECEIVER_EMAIL")
-    password = os.getenv("GOOGLE_APP_PASSWORD")
 
-    # Update the message with sender and receiver
-    msg["From"] = sender_email
-    msg["To"] = receiver_email
-
-    # Create SMTP session
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:  # Example for Gmail
-            server.starttls()  # Enable security
-            server.login(sender_email, password)
-            server.send_message(msg)
-        return "Email sent successfully"
-    except Exception as e:
-        return f"Failed to send email: {str(e)}"
-
-
-def send_low_stock_sms(message_body=None):
-    from twilio.rest import Client
-
-    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-    client = Client(account_sid, auth_token)
-
-    message = client.messages.create(
-    from_='+18669864256',
-    body='Hello from Twilio',
-    to=os.getenv('TWILIO_TARGET_NUMBER')
-    )
-
-    print(message.sid)
-
-
+# DRIVER
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
     process_daily_orders()
