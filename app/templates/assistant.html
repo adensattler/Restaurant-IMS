@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container">
-    <div class="chatContainer">
-        <div id="messages" class="messages">
-            <div id="initialMessage" class="assistantMessage"></div>
+<div class="assistantMain">
+    <div class="assistantContainer">
+        <div class="chatContainer">
+            <div id="messages" class="messages">
+                <div id="initialMessage" class="assistantMessage"></div>
+            </div>
+            <form id="chatForm" class="inputForm clearfix">
+                <input type="text" id="userInput" class="input" placeholder="Enter your question">
+                <button type="submit" class="button">Send</button>
+            </form>
         </div>
-        <form id="chatForm" class="inputForm clearfix">
-            <input type="text" id="userInput" class="input" placeholder="Enter your question">
-            <button type="submit" class="button">Send</button>
-        </form>
     </div>
 </div>
 

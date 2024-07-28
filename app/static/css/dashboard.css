@@ -7,17 +7,16 @@
 /*
  * Sidebar
  */
- .sidebar {
+ /* .sidebar {
   min-height: calc(100vh - 48px); 
   top: 48px; 
-  /* Hide sidebar by default on smaller screens */
   display: none;
-}
+} */
 
 @media (min-width: 768px) {
-  .sidebar {
-    display: block; /* Show sidebar on larger screens */
-  }
+  /* .sidebar {
+    display: block; 
+  } */
   
   .sidebar .offcanvas-lg {
     position: -webkit-sticky;
