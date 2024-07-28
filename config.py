@@ -23,6 +23,11 @@ SQUARE_ACCESS_TOKEN = os.getenv('SQUARE_ACCESS_TOKEN')
 SQUARE_LOCATION_ID = os.getenv('SQUARE_LOCATION_ID')
 
 
+# To access these vars:
+# from flask import current_app
+# square_token = current_app.config['SQUARE_ACCESS_TOKEN']
+# OR (if you have the app context)
+# square_token = app.config['SQUARE_ACCESS_TOKEN']
 
 # We can also config with classes!
 # class Config:

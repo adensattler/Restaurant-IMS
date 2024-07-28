@@ -228,6 +228,8 @@ def process_daily_orders():
     Process daily orders, update inventory, and log results. 
     Primary function to update inventory daily.
     """
+    print(f"Process daily orders run at {datetime.now()}")
+
     # get all the payments that occured today.
     payments_res = list_payments(date = datetime.now())
 
@@ -311,7 +313,7 @@ def send_low_stock_sms(message_body=None):
 
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
-    # process_daily_orders()
+    process_daily_orders()
     check_low_inventory()
     # send_low_stock_email()
 
