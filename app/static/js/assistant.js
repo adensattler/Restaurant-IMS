@@ -5,6 +5,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const userInput = document.getElementById('userInput');
     let threadId = null;
 
+    const renderer = new marked.Renderer();
+
+    renderer.paragraph = function (text) {
+        return '<p style="margin: 0; padding-bottom: 10px;">' + text + '</p>';
+    };
+
+    renderer.heading = function (text, level) {
+        if (level === 3) {
+            return '<h3 style="margin: 0; padding: 0;">' + text + '</h3>';
+        }
+        // Use default rendering for other heading levels
+        return `<h${level}>${text}</h${level}>`;
+    };
+
+    marked.use({ renderer });
+
     // Add the initial message
     const initialMessage = `
 ### Welcome to Saucy's Employee Assistance Chatbot!
@@ -45,6 +61,7 @@ Feel free to ask any questions you have, and I’ll provide you with the informa
             userInput.value = '';
         }
     });
+
 
     function appendMessage(role, text) {
         const messageDiv = document.createElement('div');
