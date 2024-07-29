@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     renderer.heading = function (text, level) {
         if (level === 3) {
-            return '<h3 style="margin: 0; padding: 0;">' + text + '</h3>';
+            return '<h3 style="margin: 0; padding-bottom: 10px;">' + text + '</h3>';
         }
         // Use default rendering for other heading levels
         return `<h${level}>${text}</h${level}>`;

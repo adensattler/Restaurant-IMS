@@ -194,16 +194,3 @@ pre {
     color: #b8b8b8;
     margin-right: 8px;
 }
-
-#initialMessage p {
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-    line-height: 1; /* Adjust as needed */
-
-  }
-
-  #initialMessage {
-    height: auto; /* Adjust as needed */
-    padding-bottom: 0; /* Remove any padding at the bottom */
-    margin-bottom: 0; /* Remove any margin at the bottom */
-  }
