@@ -18,7 +18,9 @@ except ImportError:
     import database
 
 # CONSTANTS
-IS_DEV = True
+# When IS_DEV == True, orders from the current day will be collected and processed
+# When False, orders from the previous day will be collected and processed (intended production behavior)
+IS_DEV = False
 
 
 # GET SQUARE CLIENT
@@ -196,7 +198,7 @@ def extract_order_ids(response: Dict[str, List[Dict]]) -> List[str]:
         for payment in response['payments']:
             if 'order_id' in payment:
                 order_ids.append(payment['order_id'])
-    print(f"{order_ids}\n")
+    # print(f"{order_ids}\n")
     return order_ids
 
 
@@ -209,13 +211,38 @@ def extract_sold_items(response: Dict[str, List[Dict]]) -> List[Dict[str, int]]:
     sold_items = []
     for order in response['orders']:
         for item in order['line_items']:
-            sold_items.append({
-                'name': item['name'],
-                'quantity': int(item['quantity'])
-            })
+            if 'name' in item:
+                try:
+                    quantity = int(item.get('quantity', 0))
+                    sold_items.append({
+                        'name': item['name'],
+                        'quantity': quantity
+                    })
+                except ValueError:
+                    print(f"Error processing quantity for item: {item['name']}")
+                    continue  # Skip this item and continue with the next
     print(f"{sold_items}\n")
     return sold_items
-   
+
+
+def consolidate_order_items(items: List[Dict[str, int]]) -> List[Dict[str, int]]:
+    """
+    Consolidates repeated items in an order list by summing their quantities.
+    
+    Args:
+    items (List[Dict[str, int]]): A list of dictionaries containing item names and quantities.
+    
+    Returns:
+    List[Dict[str, int]]: A consolidated list of dictionaries with unique item names and summed quantities.
+    """
+    consolidated = defaultdict(int)
+    
+    for item in items:
+        consolidated[item['name']] += item['quantity']
+    
+    return consolidated
+
+
 
 # PRIMARY FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
@@ -264,13 +291,8 @@ def batch_update_inventory(orders):
     """
     errors = []
 
-    # combine all orders for each menu item to get a total quantity used for the period
-    condensed_orders = defaultdict(int)
-    for order in orders:
-        condensed_orders[order['name']] += order['quantity']
-
     # go through each menu item 
-    for menu_item_name, quantity_used in condensed_orders.items():
+    for menu_item_name, quantity_used in orders.items():
         
         # Retrieve the menu item's id (menu_item_id)
         menu_item_id = database.get_menu_item_id(menu_item_name)
@@ -300,20 +322,26 @@ def process_daily_orders():
     Process daily orders, update inventory, and log results. 
     Primary function to update inventory daily.
     """
-    print(f"Process daily orders run at {datetime.now()}")
+    print(""" \n\n\n\n =================== DAILY ORDER PROCESSING =================== """)
+    print(f"Process daily orders run at {datetime.now()}\n")
 
     # get all the payments that occured yesterday (or today for dev testing).
     payments_res = list_payments(date = datetime.now())
 
     # Extract all order_id values from all payments
     order_ids = extract_order_ids(payments_res)
+    print(f"\nSuccessfully extracted order_ids: \n{order_ids}\n")
 
     # Retrieve all item names from every order
     response = retrieve_orders(order_ids)
     order_items = extract_sold_items(response)
 
+    consolidated_orders = consolidate_order_items(order_items)
+    print(f"Consolidated Orders: \n{consolidated_orders.items()}\n")
+
     # Update the inventory associated with each and every menu item sold
-    batch_update_inventory(order_items)
+    errors = batch_update_inventory(consolidated_orders)
+    print(f"ALL INVENTORY UPDATE ERRORS: \n{errors}\n")
 
 
 
@@ -322,8 +350,7 @@ def process_daily_orders():
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
     process_daily_orders()
-    check_low_inventory()
-    # send_low_stock_email()
+    check_low_inventory() 
 
     
 
