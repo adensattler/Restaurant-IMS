@@ -100,9 +100,9 @@ VALUES
 INSERT INTO MenuItems (category_id, name, description, price)
 VALUES
 (1, 'Sweet baby baked beans', 'Our signature baked beans', 4.00),
-(1, 'Teriyaki Parmesan Corn', 'Corn with a twist', 4.00),
+(1, 'Teriyaki Parmesean Corn', 'Corn with a twist', 4.00),
 (1, 'Great Granny''s Green Beans', 'Classic green beans', 4.00),
-(1, 'Green Chili Macaroni', 'Spicy mac and cheese', 4.00),
+(1, 'Green Chili Macaronni', 'Spicy mac and cheese', 4.00),
 (2, 'Wing Wednesday', 'Special wing deal on Wednesdays', 1.00),
 (5, 'wings a la carte', 'Just the wings', 2.00),
 (5, 'extra sauce', 'Additional sauce portion', 0.50),
