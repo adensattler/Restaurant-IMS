@@ -9,6 +9,7 @@ from authlib.integrations.flask_client import OAuth
 from ..extensions import oauth
 from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
 # from flask_login import login_required, login_user, current_user
+import square_tools
 from . import base
 
 
@@ -215,6 +216,14 @@ def logout():
             quote_via=quote_plus,
         )
     )
+
+@base.route('/cron/process_daily_orders', methods=['POST'])
+def cron_process_daily_orders():
+    try:
+        square_tools.process_daily_orders()
+        return jsonify({"status": "success", "message": "Daily orders processed successfully"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @base.route("/temp")
 def temp():

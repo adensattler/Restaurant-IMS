@@ -18,18 +18,18 @@ def init_auth(app):
         server_metadata_url=f'https://{app.config["AUTH0_DOMAIN"]}/.well-known/openid-configuration',
     )
 
-def init_scheduler(app):
-    # Schedule job
-    scheduler.add_job(
-        func=process_daily_orders,
-        # trigger=IntervalTrigger(seconds=30),
-        trigger=CronTrigger(hour=8, minute=0),  # Run at 12:01 AM
-        id='process_daily_orders_job',
-        name='Process daily orders and update inventory',
-        replace_existing=True)
+# def init_scheduler(app):
+#     # Schedule job
+#     scheduler.add_job(
+#         func=process_daily_orders,
+#         # trigger=IntervalTrigger(seconds=30),
+#         trigger=CronTrigger(hour=8, minute=0),  # Run at 12:01 AM
+#         id='process_daily_orders_job',
+#         name='Process daily orders and update inventory',
+#         replace_existing=True)
 
-    # Start the scheduler
-    scheduler.start()
+#     # Start the scheduler
+#     scheduler.start()
 
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
+#     # Shut down the scheduler when exiting the app
+#     atexit.register(lambda: scheduler.shutdown())

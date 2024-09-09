@@ -1,6 +1,7 @@
 from flask import Flask
 from .extensions import oauth, scheduler
-from .init_functions import init_auth, init_scheduler
+# from .init_functions import init_auth, init_scheduler
+from .init_functions import init_auth
 from . import database  # My custom database module
 
 
@@ -17,7 +18,7 @@ def create_app():
     init_auth(app)
     
     # Initialize scheduler
-    init_scheduler(app)
+    # init_scheduler(app)
 
     # Register blueprints 
     from .base import base as base_blueprint
