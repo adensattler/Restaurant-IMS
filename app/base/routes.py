@@ -7,9 +7,9 @@ from urllib.parse import quote_plus, urlencode
 from app.helpers import login_required
 from authlib.integrations.flask_client import OAuth
 from ..extensions import oauth
-from flask import Flask, request, session, url_for, redirect, jsonify, flash, current_app, g, render_template
+from flask import Flask, request, session, url_for, redirect, jsonify, Response, stream_with_context, flash, current_app, g, render_template
 # from flask_login import login_required, login_user, current_user
-import square_tools
+from .. import square_tools
 from . import base
 
 
@@ -30,48 +30,120 @@ def index():
 def assistant():
     return render_template('assistant.html')
 
-@base.route('/send_message', methods=['POST'])
-def send_message():
+# Routes For Assistants API Functionality
+# -------------------------------------------------------------------------------------
+@base.route("/new-thread-id", methods=["GET"])
+def new_thread_id():
     client = OpenAI(api_key=env.get("OPENAI_API_KEY"))
-    data = request.json
-    user_message = data['message']
-    thread_id = data.get('threadId')
+    thread = client.beta.threads.create()
+    return jsonify({'threadId': thread.id})
 
+
+@base.route('/add-message', methods=['POST'])
+def add_message():
+    # adds a message to a provided thread_id
+    # will be used just before /stream is called
+    data = request.get_json()
+    thread_id = data.get('threadId')
+    message = data.get('message')
+
+    client = OpenAI(api_key=env.get("OPENAI_API_KEY"))
+
+    # Add user message to thread
+    client.beta.threads.messages.create(
+        thread_id=thread_id,
+        role="user",
+        content=message,
+    )
+    
+    # Logic to add the message to the specified thread
+    return jsonify({'success': True})
+
+
+# Stream Assitants API Response
+@base.route("/stream", methods=["GET"])
+def stream():
+    client = OpenAI(api_key=env.get("OPENAI_API_KEY"))
+    thread_id = request.args.get('threadId')
+
+    # This is added redundancy
     if not thread_id:
         thread = client.beta.threads.create()
         thread_id = thread.id
     else:
         thread = client.beta.threads.retrieve(thread_id)
 
-    # Add user message to thread
-    client.beta.threads.messages.create(
-        thread_id=thread_id,
-        role="user",
-        content=user_message,
-    )
+    # Reference the Assistants API Docs here for more info on how streaming works:
+    # https://platform.openai.com/docs/api-reference/runs/createRun
+    def event_generator():
+        finished = False
+        with client.beta.threads.runs.create(
+            thread_id=thread_id,
+            assistant_id=env.get("OPENAI_ASSISTANT_ID"),
+            stream=True
+        ) as stream:
+            for event in stream:
+                if event.event == "thread.message.delta":
+                    for content in event.data.delta.content:
+                        if content.type == 'text':
+                            data = content.text.value.replace('\n', ' <br> ')
+                            yield f"data: {data}\n\n"
+                
+                elif event.event == "done":
+                    finished = True
+                    break  
+        yield f"data: finish_reason: stop\n\n"
 
-    # Run the thread
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread.id,
-        assistant_id=env.get("OPENAI_ASSISTANT_ID"),
-    )
+        if finished:
+            return
 
-    if run.status == "failed":
-        return jsonify({"error": f"Run failed: {run.last_error}"}), 500
+    return Response(stream_with_context(event_generator()), mimetype="text/event-stream")
 
-    # Retrieve the messages in the thread and get the most recent response
-    messages = client.beta.threads.messages.list(thread_id=thread.id)
-    new_response = messages.data[0].content[0].text.value
 
-    # Use re.sub() to remove the matched source tags from the API response
-    # pattern = r'【\d+†source】'
-    # cleaned_response = re.sub(pattern, '', new_response)
-    # Remove the source tags and trailing newlines
-    cleaned_response = re.sub(r'【\d+[:†]\d+†source】', '', new_response)
-    cleaned_response = cleaned_response.strip()
-    print(cleaned_response)
 
-    return jsonify({"response": cleaned_response, "threadId": thread_id})
+
+# @base.route('/send_message', methods=['POST'])
+# def send_message():
+#     client = OpenAI(api_key=env.get("OPENAI_API_KEY"))
+#     data = request.json
+#     user_message = data['message']
+#     thread_id = data.get('threadId')
+
+#     if not thread_id:
+#         thread = client.beta.threads.create()
+#         thread_id = thread.id
+#     else:
+#         thread = client.beta.threads.retrieve(thread_id)
+
+#     # Add user message to thread
+#     client.beta.threads.messages.create(
+#         thread_id=thread_id,
+#         role="user",
+#         content=user_message,
+#     )
+
+#     # Run the thread
+#     run = client.beta.threads.runs.create_and_poll(
+#         thread_id=thread.id,
+#         assistant_id=env.get("OPENAI_ASSISTANT_ID"),
+#     )
+
+#     if run.status == "failed":
+#         return jsonify({"error": f"Run failed: {run.last_error}"}), 500
+
+#     # Retrieve the messages in the thread and get the most recent response
+#     messages = client.beta.threads.messages.list(thread_id=thread.id)
+#     new_response = messages.data[0].content[0].text.value
+
+#     # Use re.sub() to remove the matched source tags from the API response
+#     # pattern = r'【\d+†source】'
+#     # cleaned_response = re.sub(pattern, '', new_response)
+#     # Remove the source tags and trailing newlines
+#     cleaned_response = re.sub(r'【\d+[:†]\d+†source】', '', new_response)
+#     cleaned_response = cleaned_response.strip()
+#     print(cleaned_response)
+
+#     return jsonify({"response": cleaned_response, "threadId": thread_id})
 
 
 

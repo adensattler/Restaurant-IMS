@@ -4,19 +4,43 @@
 <div class="assistantMain">
     <div class="assistantContainer">
         <div class="chatContainer">
-            <div id="messages" class="messages">
-                <div id="initialMessage" class="assistantMessage"></div>
+            <div id="messages">
+                <lexi-mark class="assistant-message" id="initial-message"></lexi-mark>
             </div>
+
             <form id="chatForm" class="inputForm clearfix">
-                <input type="text" id="userInput" class="input" placeholder="Enter your question">
-                <button type="submit" class="button">Send</button>
+                <input type="text" id="inputBoxID" class="input" placeholder="Enter your question">
+                <button type="submit" class="button" id="userInput">Send</button>
+                <button type="submit" class="button" id="stop" disabled>Stop</button>
             </form>
         </div>
     </div>
 </div>
 
 
-<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/assistant.js') }}"></script> -->
+<script type="module" src="{{ url_for('static', filename='js/initial-message.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script type="module" src="{{ url_for('static', filename='js/LexiMark.js') }}"></script>
+<script src="{{ url_for('static', filename='js/LexiStream.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const streamConfig = {
+            sendRequest: "/chat",
+            listen: "/stream",
+            sendContent: "#inputBoxID",
+            start: "#userInput",
+            stop: "#stop",
+            box: "#messages",
+            customLoadingMessage: "Processing",
+            isAssistant: "True"
+        };
+
+        new LexiStream(streamConfig);
+    });
+
+</script>
 
 {% endblock %}

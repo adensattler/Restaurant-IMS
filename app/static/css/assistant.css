@@ -13,19 +13,6 @@
 }
 
 
-
-
-
-
-
-:root {
-    --max-width: 1100px;
-    --border-radius: 12px;
-    --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
-        "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-        "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-}
-
 * {
     box-sizing: border-box;
     padding: 0;
@@ -38,14 +25,6 @@ body {
     overflow-x: hidden;
 }
 
-body {
-    color: rgb(var(--foreground-rgb));
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
 
 .warnings {
     position: absolute;
@@ -80,21 +59,6 @@ ol {
     padding-left: 20px;
 }
 
-a {
-    color: blue;
-}
-
-pre {
-    margin: -4px -16px;
-    padding: 20px;
-    white-space: pre-wrap;
-    background-color: #e4e4e4;
-    color: black;
-}
-
-
-
-
 
 .chatContainer {
     display: flex;
@@ -119,6 +83,7 @@ pre {
     border: 2px solid transparent;
     font-size: 1em;
     background-color: #efefef;
+    min-width: 150px;
 }
 
 .input:focus {
@@ -141,19 +106,19 @@ pre {
     background-color: lightgrey;
 }
 
-.messages {
+#messages {
     flex-grow: 1;
     overflow-y: auto;
     padding: 10px;
     display: flex;
     flex-direction: column;
     order: 2;
-    white-space: pre-wrap;
 }
 
-.userMessage,
-.assistantMessage,
-.codeMessage {
+.user-message,
+.assistant-message,
+.code-message,
+.loading {
     margin: 8px 0;
     padding: 8px 16px;
     align-self: flex-start;
@@ -163,34 +128,76 @@ pre {
     overflow-wrap: break-word;
 }
 
-.assistantMessage img {
+.assistant-message img {
     max-width: 100%;
     margin: 8px 0px 8px 0px;
     border-radius: 8px;
 }
 
-.userMessage {
+.user-message {
     align-self: flex-end;
     color: #fff;
     background-color: #000;
 }
 
-.assistantMessage {
+.assistant-message {
     background-color: #efefef;
 }
 
-.codeMessage {
+.code-message {
     padding: 10px 16px;
     background-color: #e9e9e9;
     font-family: monospace;
     counter-reset: line;
 }
 
-.codeMessage>div {
+.code-message>div {
     margin-top: 4px;
 }
 
-.codeMessage span {
+.code-message span {
     color: #b8b8b8;
     margin-right: 8px;
+}
+
+.loading {
+    background-color: #efefef;
+}
+
+.loading::after {
+    content: "";
+    animation: dots 1.5s steps(1) infinite;
+}
+
+@keyframes dots {
+
+    0%,
+    20% {
+        content: "";
+        /* No dots initially */
+    }
+
+    21%,
+    40% {
+        content: ".";
+        /* One dot appears */
+    }
+
+    41%,
+    60% {
+        content: "..";
+        /* Two dots appear */
+    }
+
+    61%,
+    80% {
+        content: "...";
+        /* Three dots appear */
+    }
+
+    81%,
+    100% {
+        content: "...";
+        /* Keep three dots before restarting */
+    }
 }
