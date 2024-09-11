@@ -26,6 +26,32 @@ def index():
     cursor.close()
     return render_template('index.html', inventory=inventory)
 
+@base.route('/menu-items')
+# @login_required
+def menu_items():
+    db = database.get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # SQL query to fetch menu items along with their associated data
+    query = """
+    SELECT 
+        MenuItems.menu_item_id AS item_id,
+        MenuItems.name AS menu_item_name,
+        MenuItems.description AS menu_item_description,
+        Categories.name AS category_name
+    FROM 
+        MenuItems
+    JOIN 
+        Categories ON MenuItems.category_id = Categories.category_id;
+    """
+
+    cursor.execute(query)
+    menu_items = cursor.fetchall()
+    cursor.close()
+
+    # Render the menu items page with the fetched data
+    return render_template('menu_items.html', menu_items=menu_items)
+
 @base.route('/assistant')
 def assistant():
     return render_template('assistant.html')
