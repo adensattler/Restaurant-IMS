@@ -19,9 +19,9 @@
             <!-- DataTables buttons will be inserted here -->
         </div>
         <!-- Create item modal -->
-        <button type="button" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="modal"
+        <!-- <button type="button" class="btn btn-primary d-flex align-items-center gap-1" data-bs-toggle="modal"
             data-bs-target="#createItemModal">Create Item
-        </button>
+        </button> -->
     </div>
 </div>
 
@@ -55,7 +55,7 @@
                             </svg>
                         </div>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item edit-item" data-bs-toggle="modal" data-bs-target="#editItemModal" 
+                            <a class="dropdown-item edit-menu-item" data-bs-toggle="modal" data-bs-target="#editMenuItemModal" 
                                 data-item-id="{{ item.item_id }}">Edit
                             </a>
                             <a class="dropdown-item" href="#">Duplicate</a>
@@ -80,62 +80,40 @@
 <!-- EDIT Menu Item Modal -->
 <div id="editMenuItemModal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-fullscreen">
-        <form id="createMenuItemForm" action="/updatemenuitem" method="post">
-
+        <form id="editMenuItemForm" action="/update_menu_item" method="post">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="submit" class="btn btn-primary">Submit</button>
-
                     <h2 class="modal-title w-100 text-center">Edit Menu Item</h2>
-
-
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
                 <div class="modal-body">
                     <div class="container" style="max-width: 750px;">
-
                         <h5 class="modal-title">Details</h5>
-
-                        <input type="hidden" type="text" id="editMenuItemID" name="editMenuItemID" class="form-control"
-                            value="" />
-
+                        <input type="hidden" id="editMenuItemID" name="editMenuItemID" class="form-control" value="" />
                         <div class="mb-3">
-                            <label>Name</label>
-                            <input type="text" id="editMenuItemName" name="editMenuItemName" placeholder="Name"
-                                class="form-control" value="" />
+                            <label for="editMenuItemName">Name</label>
+                            <input type="text" id="editMenuItemName" name="editMenuItemName" placeholder="Name" class="form-control" value="" />
                         </div>
-
                         <div class="mb-3">
                             <label for="editMenuItemDescription">Description</label>
-                            <textarea id="editMenuItemDescription" name="editMenuItemDescription" placeholder="Description"
-                                class="form-control"></textarea>
+                            <textarea id="editMenuItemDescription" name="editMenuItemDescription" placeholder="Description" class="form-control"></textarea>
                         </div>
-
                         <div class="mb-3">
                             <label for="editMenuItemCategory">Category</label>
-                            <input id="editMenuItemCategory" name="editMenuItemCategory" placeholder="Category"
-                                class="form-control">
+                            <input id="editMenuItemCategory" name="editMenuItemCategory" placeholder="Category" class="form-control">
                         </div>
-
-                        <div class="mb-3">
-                            <label for="editMenuItemPrice">Price</label>
-                            <input type="text" id="editMenuItemPrice" name="editMenuItemPrice" placeholder="Price"
-                                class="form-control" value="" />
-                        </div>
-
-                        <h5>Manage Components</h5>
-                        <div class="mb-3">
-                            <label for="editMenuItemComponents">Components</label>
-                            <input type="text" id="editMenuItemComponents" name="editMenuItemComponents" placeholder="Components"
-                                class="form-control" value="" />
-                        </div>
+                        <h5>Components</h5>
+                        <ul id="menuItemComponentsList">
+                            <!-- Menu item components will be populated here -->
+                        </ul>
                     </div>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
 
 
 <br>
@@ -176,7 +154,7 @@
 <!-- <script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.0.5/af-2.7.0/b-3.0.2/b-colvis-3.0.2/b-html5-3.0.2/cr-2.0.1/date-1.5.2/fh-4.0.1/rg-1.5.0/rr-1.5.0/sb-1.7.1/sp-2.3.1/sl-2.0.1/sr-1.4.1/datatables.min.js"></script> -->
 
 <!-- Custom JS Links-->
-<!-- <script defer src="../static/js/datatable.js"></script> -->
 <script defer src="../static/js/menuitemdatatable.js"></script>
+<script defer src="../static/js/menu-items.js"></script>
 
 {% endblock %}

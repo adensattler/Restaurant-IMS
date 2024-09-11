@@ -52,6 +52,40 @@ def menu_items():
     # Render the menu items page with the fetched data
     return render_template('menu_items.html', menu_items=menu_items)
 
+@base.route('/get_menu_item_details', methods=['POST'])
+def get_menu_item_details():
+    menu_item_id = request.form.get('editMenuItemId')
+    db = database.get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch menu item details
+    cursor.execute("""
+        SELECT MenuItems.*, Categories.name AS category_name
+        FROM MenuItems
+        JOIN Categories ON MenuItems.category_id = Categories.category_id
+        WHERE MenuItems.menu_item_id = %s
+    """, (menu_item_id,))
+    menu_item = cursor.fetchone()
+
+    # Fetch menu item components
+    cursor.execute("""
+        SELECT InventoryItems.name AS inventory_item_name, MenuItemComponents.quantity_required,  MenuItemComponents.unit
+        FROM MenuItemComponents
+        JOIN InventoryItems ON MenuItemComponents.inventory_item_id = InventoryItems.inventory_item_id
+        WHERE MenuItemComponents.menu_item_id = %s
+    """, (menu_item_id,))
+    components = cursor.fetchall()
+    print(components)
+
+    cursor.close()
+    return jsonify({
+        'menu_item_id': menu_item['menu_item_id'],
+        'name': menu_item['name'],
+        'description': menu_item['description'],
+        'category_name': menu_item['category_name'],
+        'components': components
+    })
+
 @base.route('/assistant')
 def assistant():
     return render_template('assistant.html')
