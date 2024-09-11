@@ -12,7 +12,7 @@ $(document).ready(function () {
     // Function to handle click event on table rows
     $('.edit-item').click(function () {
         var editItemId = $(this).data('item-id'); // Retrieve item ID from data attribute
-        console.log(editItemId)
+        // console.log(editItemId)
         $.ajax({
             url: '/get_item_details', // Flask route to handle the request
             method: 'POST',
