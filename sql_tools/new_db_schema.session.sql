@@ -204,3 +204,9 @@ SELECT * FROM InventoryItems;
 DROP TABLE MenuItemComponents;
 DROP TABLE MenuItems;
 DROP TABLE InventoryItems;
+
+-- @block
+ SELECT InventoryItems.name AS inventory_item_name, MenuItemComponents.quantity_required
+        FROM MenuItemComponents
+        JOIN InventoryItems ON MenuItemComponents.inventory_item_id = InventoryItems.inventory_item_id
+        WHERE MenuItemComponents.menu_item_id = 4
