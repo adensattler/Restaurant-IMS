@@ -47,10 +47,14 @@ def menu_items():
 
     cursor.execute(query)
     menu_items = cursor.fetchall()
+
+    # Fetch inventory items to populate the dropdown
+    cursor.execute("SELECT inventory_item_id, name FROM InventoryItems;")
+    inventory_items = cursor.fetchall()
     cursor.close()
 
     # Render the menu items page with the fetched data
-    return render_template('menu_items.html', menu_items=menu_items)
+    return render_template('menu_items.html', menu_items=menu_items, inventory_items=inventory_items)
 
 @base.route('/get_menu_item_details', methods=['POST'])
 def get_menu_item_details():
@@ -69,7 +73,7 @@ def get_menu_item_details():
 
     # Fetch menu item components
     cursor.execute("""
-        SELECT InventoryItems.name AS inventory_item_name, MenuItemComponents.quantity_required,  MenuItemComponents.unit
+        SELECT InventoryItems.name AS inventory_item_name, InventoryItems.inventory_item_id, MenuItemComponents.quantity_required, MenuItemComponents.unit
         FROM MenuItemComponents
         JOIN InventoryItems ON MenuItemComponents.inventory_item_id = InventoryItems.inventory_item_id
         WHERE MenuItemComponents.menu_item_id = %s
@@ -85,6 +89,47 @@ def get_menu_item_details():
         'category_name': menu_item['category_name'],
         'components': components
     })
+
+@base.route('/add_menu_item_component', methods=['POST'])
+def add_menu_item_component():
+    menu_item_id = request.form.get('menu_item_id')
+    inventory_item_id = request.form.get('inventory_item_id')
+    quantity_required = request.form.get('quantity_required')
+
+    db = database.get_db()
+    cursor = db.cursor()
+
+    # Insert new component
+    cursor.execute("""
+        INSERT INTO MenuItemComponents (menu_item_id, inventory_item_id, quantity_required)
+        VALUES (%s, %s, %s)
+    """, (menu_item_id, inventory_item_id, quantity_required))
+
+    db.commit()
+    cursor.close()
+
+    return jsonify({'status': 'success'})
+
+
+@base.route('/delete_menu_item_component', methods=['POST'])
+def delete_menu_item_component():
+    menu_item_id = request.form.get('menu_item_id')
+    inventory_item_id = request.form.get('inventory_item_id')
+    print(menu_item_id, inventory_item_id)
+
+    db = database.get_db()
+    cursor = db.cursor()
+
+    # Delete the component
+    cursor.execute("""
+        DELETE FROM MenuItemComponents
+        WHERE menu_item_id = %s AND inventory_item_id = %s
+    """, (menu_item_id, inventory_item_id))
+
+    db.commit()
+    cursor.close()
+
+    return jsonify({'status': 'success'})
 
 @base.route('/assistant')
 def assistant():

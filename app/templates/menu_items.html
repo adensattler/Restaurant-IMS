@@ -80,7 +80,7 @@
 <!-- EDIT Menu Item Modal -->
 <div id="editMenuItemModal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-fullscreen">
-        <form id="editMenuItemForm" action="/update_menu_item" method="post">
+        <div id="editMenuItemForm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -103,14 +103,35 @@
                             <label for="editMenuItemCategory">Category</label>
                             <input id="editMenuItemCategory" name="editMenuItemCategory" placeholder="Category" class="form-control">
                         </div>
+
+
                         <h5>Components</h5>
                         <ul id="menuItemComponentsList">
                             <!-- Menu item components will be populated here -->
                         </ul>
+
+                        <hr>
+                        <h6>Add New Component</h6>
+                        <div class="form-group">
+                            <label for="newComponent">Inventory Item</label>
+                            <select id="newComponent" class="form-control">
+                                <!-- Populate this dynamically with available inventory items -->
+                                {% for item in inventory_items %}
+                                    <option value="{{ item.inventory_item_id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newQuantity">Quantity Required</label>
+                            <input type="number" id="newQuantity" class="form-control" step="0.01">
+                        </div>
+                        <button id="addComponentBtn" class="btn btn-primary">Add Component</button>
+
+
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
