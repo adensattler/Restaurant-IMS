@@ -157,13 +157,13 @@ VALUES
 (3, 1, 2.0, 'cans'), -- Canned Green Beans
 (3, 2, 1.25, 'cups'), -- Bullion
 (3, 3, 3.0, 'pieces'), -- Potatoes
-(3, 4, 3.0, 'strips'); -- Bacon
+(3, 4, 3.0, 'strips'), -- Bacon
 
 -- Sweet Baby Baked Beans (Menu Item ID: 1)
 (1, 5, 2.0, 'cans'), -- Baked Beans
 (1, 6, 1.25, 'cups'), -- BBQ Sauce
 (1, 7, 1.5, 'oz'), -- Brown Sugar
-(1, 8, 1.0, 'lb'); -- Jimmy Dean Sausage
+(1, 8, 1.0, 'lb'), -- Jimmy Dean Sausage
 
 -- Green Chili Mac & Cheese (Menu Item ID: 4)
 (4, 9, 2.5, 'sticks'), -- Butter
@@ -176,20 +176,20 @@ VALUES
 (4, 16, 1.0, 'bag'), -- Cheddar Cheese
 (4, 17, 5.0, 'cups'), -- Parmesan Cheese
 (4, 18, 4.0, 'cups'), -- Blue Cheese
-(4, 19, 8.0, 'oz'); -- Macaroni Noodles
+(4, 19, 8.0, 'oz'), -- Macaroni Noodles
 
 -- Rib Plate (Menu Item ID: 14)
 (14, 20, 4.0, 'slabs'), -- Pork Ribs
 (14, 21, 1.0, 'oz'), -- Apple Cider Vinegar
 (14, 22, 8.0, 'cups'), -- Paprika
 (14, 23, 1.5, 'cups'), -- Cayenne Pepper
-(14, 24, 4.0, 'cups'); -- Brown Sugar
+(14, 24, 4.0, 'cups'), -- Brown Sugar
 
 -- Wing Plate (Menu Item ID: 13)
-(13, 25, 6.0, 'lbs'); -- Chicken Wings
+(13, 25, 6.0, 'lbs'), -- Chicken Wings
 
 -- Hotlink Plate (Menu Item ID: 15)
-(15, 26, 1.0, 'link'); -- Hotlink
+(15, 26, 1.0, 'link'), -- Hotlink
 
 -- Catfish Plate (Menu Item ID: 16)
 (16, 27, 1.0, 'pieces'); -- Catfish Fillet
@@ -199,6 +199,9 @@ SELECT * FROM MenuItems;
 
 -- @block
 SELECT * FROM InventoryItems;
+
+-- @block
+SELECT * FROM MenuItemComponents;
 
 -- @block 
 DROP TABLE MenuItemComponents;
