@@ -40,7 +40,7 @@ def get_square_client() -> Client:
                 bearer_auth_credentials=BearerAuthCredentials(
                 access_token=os.getenv('SQUARE_ACCESS_TOKEN')
                 ),
-                environment=current_app.config['SQUARE_ENVIRONMENT']
+                environment=os.getenv('SQUARE_ENVIRONMENT', 'sandbox')
             )
         return g.square_client
     else:
