@@ -110,7 +110,7 @@ VALUES
 (1, 'Apple Cider Vinegar', 'Apple cider vinegar', 'oz', 0.05, 100, 10),
 (1, 'Paprika', 'Ground paprika', 'cups', 1.00, 40, 5),
 (1, 'Cayenne Pepper', 'Ground cayenne pepper', 'cups', 1.50, 30, 5),
-(1, 'Brown Sugar', 'Brown sugar', 'cups', 0.05, 100, 10),
+-- (1, 'Brown Sugar', 'Brown sugar', 'cups', 0.05, 100, 10),
 
 -- Wings Ingredients
 (1, 'Chicken Wings', 'Fresh chicken wings', 'lbs', 2.00, 30, 10),
@@ -205,7 +205,11 @@ SELECT * FROM MenuItemComponents;
 
 -- @block 
 DROP TABLE MenuItemComponents;
+
+-- @block 
 DROP TABLE MenuItems;
+
+-- @block 
 DROP TABLE InventoryItems;
 
 -- @block
