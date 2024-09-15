@@ -58,7 +58,14 @@ def menu_items():
     menu_items = cursor.fetchall()
 
     # Fetch inventory items to populate the dropdown
-    cursor.execute("SELECT inventory_item_id, name FROM InventoryItems;")
+    cursor.execute("""
+        SELECT inventory_item_id, name, Units.unit_abbreviation AS unit_abbreviation
+        FROM 
+            InventoryItems
+        JOIN 
+            Units ON InventoryItems.unit_id = Units.unit_id;
+
+    """)
     inventory_items = cursor.fetchall()
     cursor.close()
 
