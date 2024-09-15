@@ -21,8 +21,8 @@ $(document).ready(function () {
                 response.components.forEach(function(component) {
                     $('#menuItemComponentsList').append(`
                         <li>
-                            ${component.inventory_item_name}: 
-                            ${component.quantity_required} ${component.unit_abbreviation}
+                            ${component.inventory_item_name} (${component.unit_abbreviation}) – 
+                            ${component.quantity_required} 
                             <button class="btn btn-sm btn-danger remove-component" 
                                     data-inventory-item-id="${component.inventory_item_id}">
                                 X
@@ -54,7 +54,7 @@ $(document).ready(function () {
                 if (response.status === 'success') {
                     // Optionally update the UI
                     $('#menuItemComponentsList').append(
-                        `<li>${$('#newComponent option:selected').text()} - ${quantity_required} 
+                        `<li>${$('#newComponent option:selected').text()} – ${quantity_required} 
                         <button class="btn btn-danger remove-component" data-inventory-item-id="${inventory_item_id}">X</button></li>`
                     );
                 }

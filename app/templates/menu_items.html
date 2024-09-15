@@ -117,7 +117,7 @@
                             <select id="newComponent" class="form-control">
                                 <!-- Populate this dynamically with available inventory items -->
                                 {% for item in inventory_items %}
-                                    <option value="{{ item.inventory_item_id }}">{{ item.name }}</option>
+                                    <option value="{{ item.inventory_item_id }}">{{ item.name }} ({{ item.unit_abbreviation}})</option>
                                 {% endfor %}
                             </select>
                         </div>
