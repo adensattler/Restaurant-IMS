@@ -259,7 +259,17 @@ def remove_item():
 
     db = database.get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM InventoryItems WHERE inventory_item_id= %s", (item_id,))
+
+    # Step 1: Delete associated components from MenuItemComponents
+    cursor.execute("""
+        DELETE FROM MenuItemComponents WHERE inventory_item_id = %s
+    """, (item_id,))
+
+    # Step 2: Delete the inventory item itself
+    cursor.execute("""
+        DELETE FROM InventoryItems WHERE inventory_item_id = %s
+    """, (item_id,))
+
     db.commit()
     cursor.close()
     return redirect("/")
@@ -394,10 +404,14 @@ def logout():
         )
     )
 
+# to test this cron route locally
+# curl -X POST http://127.0.0.1:5000/cron/process_daily_orders \
+#      -H "Content-Type: application/json"
 @base.route('/cron/process_daily_orders', methods=['POST'])
 def cron_process_daily_orders():
     try:
         square_tools.process_daily_orders()
+        # square_tools.check_low_inventory() 
         return jsonify({"status": "success", "message": "Daily orders processed successfully"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
