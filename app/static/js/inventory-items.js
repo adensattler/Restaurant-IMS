@@ -25,7 +25,7 @@ $(document).ready(function () {
                 $('#editItemLocation').val(response.location_id);
                 $('#editItemGTIN').val(response.GTIN);
                 $('#editItemSKU').val(response.SKU);
-                $('#editItemUnit').val(response.unit);
+                $('#editItemUnit').val(response.unit_id);
                 $('#editItemWeight').val(response.weight);
                 $('#editItemPrice').val(response.price);
                 $('#editItemStock').val(response.stock);

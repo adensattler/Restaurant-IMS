@@ -19,7 +19,16 @@ def index():
     db = database.get_db()
     cursor = db.cursor(dictionary=True)
 
-    query = " SELECT InventoryItems.*, Locations.location_name FROM InventoryItems JOIN Locations ON InventoryItems.location_id = Locations.location_id;"
+    query = """
+    SELECT 
+        InventoryItems.*, 
+        Locations.location_name,
+        Units.unit_name,
+        Units.unit_abbreviation
+    FROM InventoryItems 
+    JOIN Locations ON InventoryItems.location_id = Locations.location_id
+    LEFT JOIN Units ON InventoryItems.unit_id = Units.unit_id;
+    """
 
     cursor.execute(query)
     inventory = cursor.fetchall()
@@ -285,7 +294,7 @@ def create_item():
     item_location = request.form['itemLocation']
     item_GTIN = request.form['itemGTIN']
     item_SKU = request.form['itemSKU']
-    item_unit = request.form['itemUnit']
+    item_unit_id = request.form['itemUnit']
     item_weight = request.form['itemWeight'] if request.form['itemWeight'] else None
     item_price = request.form['itemPrice'] if request.form['itemPrice'] else None
     item_stock = request.form['itemStock'] if request.form['itemStock'] else None
@@ -295,10 +304,10 @@ def create_item():
     cursor = db.cursor()
     # Execute the SQL query to insert a new item
     insert_query = """
-    INSERT INTO InventoryItems (name, description, location_id, GTIN, SKU, unit, weight, price, stock, low_stock_level)
+    INSERT INTO InventoryItems (name, description, location_id, GTIN, SKU, unit_id, weight, price, stock, low_stock_level)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
-    cursor.execute(insert_query, (item_name, item_description, 1, item_GTIN, item_SKU, item_unit, item_weight, item_price, item_stock, item_low_stock_level))
+    cursor.execute(insert_query, (item_name, item_description, 1, item_GTIN, item_SKU, item_unit_id, item_weight, item_price, item_stock, item_low_stock_level))
 
     db.commit()
     cursor.close()
@@ -311,7 +320,7 @@ def update_item():
     if not request.form.get("editItemName"):
         return "Item name is required."
 
-    # collect a
+    # collect all data points
     item_id = request.form['editItemID']
     print(item_id)
     item_name = request.form['editItemName']
@@ -320,7 +329,7 @@ def update_item():
     item_location = request.form['editItemLocation']
     item_GTIN = request.form['editItemGTIN']
     item_SKU = request.form['editItemSKU']
-    item_unit = request.form['editItemUnit']
+    item_unit_id = request.form['editItemUnit']
     item_weight = request.form['editItemWeight'] if request.form['editItemWeight'] else None
     item_price = request.form['editItemPrice'] if request.form['editItemPrice'] else None
     item_stock = request.form['editItemStock'] if request.form['editItemStock'] else None
@@ -337,14 +346,14 @@ def update_item():
         location_id = %s,
         GTIN = %s,
         SKU = %s,
-        unit = %s,
+        unit_id = %s,
         weight = %s,
         price = %s,
         stock = %s,
         low_stock_level = %s
     WHERE inventory_item_id = %s
     """
-    cursor.execute(update_query, (item_name, item_description, item_location, item_GTIN, item_SKU, item_unit, item_weight, item_price, item_stock, item_low_stock_threshold, item_id))
+    cursor.execute(update_query, (item_name, item_description, item_location, item_GTIN, item_SKU, item_unit_id, item_weight, item_price, item_stock, item_low_stock_threshold, item_id))
     
     db.commit()
     cursor.close()
@@ -354,10 +363,14 @@ def update_item():
 @base.route('/get_item_details', methods=['POST'])
 def get_item_details():
     item_id = request.form.get('editItemId')
-    print(item_id)
     db = database.get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM InventoryItems WHERE InventoryItems.inventory_item_id = %s", (item_id,))
+    cursor.execute("""
+        SELECT InventoryItems.*, Units.unit_id, Units.unit_name, Units.unit_abbreviation 
+        FROM InventoryItems 
+        LEFT JOIN Units ON InventoryItems.unit_id = Units.unit_id 
+        WHERE InventoryItems.inventory_item_id = %s
+    """, (item_id,))
     item_details = cursor.fetchone()
     cursor.close()
     

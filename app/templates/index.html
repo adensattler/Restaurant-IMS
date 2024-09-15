@@ -33,6 +33,7 @@
                 <th scope="col" class="location-col">Location</th>
                 <th>GTIN</th>
                 <th scope="col" class="sku-col">SKU</th>
+                <th>Unit</th>
                 <th scope="col" class="stock-col">Stock</th>
                 <th scope="col" class="low-stock-col">Low Stock Level</th>
                 <th>Price</th>
@@ -51,9 +52,10 @@
                 <td>{{ item.location_name|none_to_empty }}</td>
                 <td>{{ item.GTIN|none_to_empty }}</td>
                 <td>{{ item.SKU|none_to_empty }}</td>
+                <td>{{ item.unit_name|none_to_empty }}</td>
                 <td>{{ item.stock|none_to_empty }}</td>
                 <td>{{ item.low_stock_level|none_to_empty }}</td>
-                <td>{{ item.price|none_to_empty_price(item.unit) }}</td>
+                <td>{{ item.price|none_to_empty_price(item.unit_abbreviation) }}</td>
                 <td>{{ item.weight|none_to_empty }}</td>
                 <td>
                     <div class="dropdown">
@@ -172,10 +174,25 @@
                                 value="" />
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="itemUnit">Unit</label>
                             <input type="text" id="itemUnit" name="itemUnit" placeholder="Unit" class="form-control"
                                 value="" />
+                        </div> -->
+                        <div class="mb-3">
+                            <label for="itemUnit">Unit</label>
+                            <select id="itemUnit" name="itemUnit" class="form-control">
+                                <option value="">Select a unit</option>
+                                <option value="1">Pound (lb)</option>
+                                <option value="2">Ounce (oz)</option>
+                                <option value="3">Kilogram (kg)</option>
+                                <option value="4">Gram (g)</option>
+                                <option value="5">Cup (cup)</option>
+                                <option value="6">Liter (l)</option>
+                                <option value="7">Milliliter (ml)</option>
+                                <option value="8">Gallon (gal)</option>
+                                <option value="9">Each (ea)</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
@@ -265,10 +282,25 @@
                                 class="form-control" value="" />
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="editItemUnit">Unit</label>
                             <input type="text" id="editItemUnit" name="editItemUnit" placeholder="Unit"
                                 class="form-control" value="" />
+                        </div> -->
+                        <div class="mb-3">
+                            <label for="editItemUnit">Unit</label>
+                            <select id="editItemUnit" name="editItemUnit" class="form-control">
+                                <option value="">Select a unit</option>
+                                <option value="1">Pound (lb)</option>
+                                <option value="2">Ounce (oz)</option>
+                                <option value="3">Kilogram (kg)</option>
+                                <option value="4">Gram (g)</option>
+                                <option value="5">Cup (cup)</option>
+                                <option value="6">Liter (l)</option>
+                                <option value="7">Milliliter (ml)</option>
+                                <option value="8">Gallon (gal)</option>
+                                <option value="9">Each (ea)</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
