@@ -80,15 +80,20 @@ def get_menu_item_details():
     """, (menu_item_id,))
     menu_item = cursor.fetchone()
 
-    # Fetch menu item components
+    # Fetch menu item components with unit information
     cursor.execute("""
-        SELECT InventoryItems.name AS inventory_item_name, InventoryItems.inventory_item_id, MenuItemComponents.quantity_required, MenuItemComponents.unit
+        SELECT 
+            InventoryItems.name AS inventory_item_name, 
+            InventoryItems.inventory_item_id, 
+            MenuItemComponents.quantity_required,
+            Units.unit_name,
+            Units.unit_abbreviation
         FROM MenuItemComponents
         JOIN InventoryItems ON MenuItemComponents.inventory_item_id = InventoryItems.inventory_item_id
+        JOIN Units ON InventoryItems.unit_id = Units.unit_id
         WHERE MenuItemComponents.menu_item_id = %s
     """, (menu_item_id,))
     components = cursor.fetchall()
-    print(components)
 
     cursor.close()
     return jsonify({
