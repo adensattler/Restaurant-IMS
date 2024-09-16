@@ -53,6 +53,29 @@ def close_db(e=None):
 def init_app(app):
     app.teardown_appcontext(close_db)
 
+def get_inventory_item(inventory_item_id):
+    """
+    Retrieve details of an inventory item.
+    
+    Args: inventory_item_id (int): The ID of the inventory item.
+    Returns: Dict: A dictionary containing item details including name and unit.
+    """
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    query = """
+    SELECT InventoryItems.name, Units.unit_name
+    FROM InventoryItems
+    JOIN Units ON InventoryItems.unit_id = Units.unit_id
+    WHERE InventoryItems.inventory_item_id = %s
+    """
+    
+    cursor.execute(query, (inventory_item_id,))
+    item = cursor.fetchone()
+    cursor.close()
+    
+    return item
+
 # Takes a menu item name and returns its associated ID if it exists in the database
 def get_menu_item_id(menu_item_name):
     db = get_db()
