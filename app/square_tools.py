@@ -56,32 +56,35 @@ def get_square_client() -> Client:
 
 # LOW INVENTORY REPORTING FUNCTIONS
 # -----------------------------------------------------------------------------------------------------------------------
-def check_low_inventory():
+def compile_inventory_report(errors, inventory_used):
     # query database to get all inventory items where 
     low_inventory = database.get_low_stock_items()
     print(low_inventory)
 
-    # parse the response and compile a list off all elements below stock
-    if not low_inventory:
-        return "No items are currently below their low stock level."
-
     # Set up Jinja2 environment
     env = Environment(loader=FileSystemLoader('app/templates'))
     template = env.get_template('email_template.html')
-    html_body = template.render(items=low_inventory)    # Render the HTML template with the low inventory items
+    
+    # Render the HTML template with all the required data
+    html_body = template.render(
+        items=low_inventory,
+        errors=errors,
+        inventory_used=inventory_used
+    )
 
     # Create a MIME multipart message
     msg = MIMEMultipart()
-    msg['Subject'] = "Low Stock Items Report"
-    msg.attach(MIMEText(html_body, 'html'))         # Attach the HTML content
+    msg['Subject'] = "Daily Inventory Report"
+    msg.attach(MIMEText(html_body, 'html'))
 
-    # call the send email function with your message!!!
-    result = send_low_stock_email(msg)
+    # call the send email function with your message
+    result = send_inventory_email(msg)
     print(result)
     
-    return "Low stock email sent."
+    return "Inventory report email sent."
 
-def send_low_stock_email(msg):
+
+def send_inventory_email(msg):
     # Email configuration
     sender_email = os.getenv("SENDER_EMAIL")
     receiver_email = os.getenv("RECEIVER_EMAIL")
@@ -360,7 +363,7 @@ def process_daily_orders():
         print(f"{item}: {data['quantity']} {data['unit']}")
 
 
-    check_low_inventory() 
+    compile_inventory_report(errors, inventory_used) 
 
 
 
@@ -369,7 +372,6 @@ def process_daily_orders():
 if __name__ == '__main__':
     # print(get_start_end_times_yesterday())
     process_daily_orders()
-    check_low_inventory() 
 
     
 
