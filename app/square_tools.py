@@ -284,15 +284,16 @@ def format_rfc3339(dt: datetime) -> str:
 
 def batch_update_inventory(orders):
     """
-    Update DATABASE inventory based on a list of orders from extract_sold_items.
+    Update DATABASE inventory based on a list of orders and return a summary of inventory used.
 
-    Args: orders (List[Dict[str, int]]): A list of dictionaries containing item names and quantities.
-    Returns: List[str]: Nothing if successful! A list of error messages if unsuccessful.
+    Args: orders (Dict[str, int]): A dictionary containing item names and quantities.
+    Returns: Tuple[List[str], Dict[str, float]]: A tuple containing a list of error messages (if any) and a dictionary of inventory usage.
     """
     errors = []
+    inventory_usage = {}
 
-    # go through each menu item 
-    for menu_item_name, quantity_used in orders.items():
+    # Go through each menu item 
+    for menu_item_name, quantity_ordered in orders.items():
         
         # Retrieve the menu item's id (menu_item_id)
         menu_item_id = database.get_menu_item_id(menu_item_name)
@@ -305,15 +306,26 @@ def batch_update_inventory(orders):
         
         for component in components:
             inventory_item_id = component['inventory_item_id']
-            total_quantity_used= component['quantity_required'] * quantity_used
+            quantity_required = component['quantity_required']
+            total_quantity_used = quantity_required * quantity_ordered
             
             # Update inventory
             database.update_inventory_quantity(inventory_item_id, total_quantity_used)
             
+            # Get inventory item details
+            inventory_item = database.get_inventory_item(inventory_item_id)
+            item_name = inventory_item['name']
+            unit_name = inventory_item['unit_name']
+            
+            # Update inventory usage dictionary
+            if item_name not in inventory_usage:
+                inventory_usage[item_name] = {'quantity': 0, 'unit': unit_name}
+            inventory_usage[item_name]['quantity'] += total_quantity_used
+
     if not errors:
         print("Inventory updated successfully")
-    else:
-        return errors
+    
+    return errors, inventory_usage
 
 
 # DRIVER FUNCTION
@@ -340,8 +352,15 @@ def process_daily_orders():
     print(f"Consolidated Orders: \n{consolidated_orders.items()}\n")
 
     # Update the inventory associated with each and every menu item sold
-    errors = batch_update_inventory(consolidated_orders)
+    errors, inventory_used = batch_update_inventory(consolidated_orders)
     print(f"ALL INVENTORY UPDATE ERRORS: \n{errors}\n")
+
+    print("\nInventory Usage Summary:")
+    for item, data in inventory_used.items():
+        print(f"{item}: {data['quantity']} {data['unit']}")
+
+
+    check_low_inventory() 
 
 
 
