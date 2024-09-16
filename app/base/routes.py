@@ -430,8 +430,10 @@ def logout():
     )
 
 # to test this cron route locally
-# curl -X POST http://127.0.0.1:5000/cron/process_daily_orders \
-#      -H "Content-Type: application/json"
+'''
+curl -X POST http://127.0.0.1:5000/cron/process_daily_orders \
+     -H "Content-Type: application/json" 
+'''
 @base.route('/cron/process_daily_orders', methods=['POST'])
 def cron_process_daily_orders():
     try:
